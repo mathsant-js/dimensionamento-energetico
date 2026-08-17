@@ -1,0 +1,16 @@
+Desenvolva um sistema simples para estimativa do
+consumo médio mensal de energia elétrica de uma residência.
+O sistema deverá permitir o cadastro do imóvel, 
+contendo informações básicas para sua identificação. 
+
+Deverá também possuir uma base de dados de equipamentos elétricos, 
+na qual cada equipamento será identificado por seu nome, 
+categoria e potência nominal em watts (W).
+
+Para cada imóvel, o usuário poderá selecionar os equipamentos existentes
+na residência e informar a quantidade e o tempo médio diário de utilização de cada equipamento.
+A partir dessas informações, o sistema deverá calcular o consumo médio mensal 
+estimado de cada equipamento, considerando sua potência, quantidade e período de utilização. 
+
+Ao final, deverá apresentar o consumo total médio mensal estimado do imóvel, em kWh/mês, 
+obtido pela soma do consumo de todos os equipamentos cadastrados.
