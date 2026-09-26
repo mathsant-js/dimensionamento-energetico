@@ -2,5 +2,5 @@ fastapi
 uvicorn
 python-jose[cryptography]
 passlib[bcrypt]
-pydantic
+pydantic[email]
 sqlalchemy
