@@ -57,6 +57,7 @@ def test_data_isolation():
         
         # Create properties for each user
         db_property1 = Property(
+            identification="Minha Casa Teste 1",
             address="123 User One St",
             city="City One",
             state="ST",
@@ -70,6 +71,7 @@ def test_data_isolation():
         )
         
         db_property2 = Property(
+            identification="Apartamento Teste 2",
             address="456 User Two Ave",
             city="City Two",
             state="ST",

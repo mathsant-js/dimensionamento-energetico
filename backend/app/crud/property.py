@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from . import models, schemas
+from .. import models, schemas
 
 def get_property(db: Session, property_id: int, user_id: int):
     return db.query(models.Property).filter(

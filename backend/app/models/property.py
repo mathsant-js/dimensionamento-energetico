@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, func, ForeignKey, Float
 from sqlalchemy.orm import relationship
-from .user import Base
+from ..database import Base
 
 class Property(Base):
     __tablename__ = "properties"

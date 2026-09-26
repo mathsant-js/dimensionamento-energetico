@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
-from . import models
-from .schemas import user as user_schema
-from .auth import get_password_hash
+from .. import models
+from ..schemas import user as user_schema
+from ..auth import get_password_hash
 
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()

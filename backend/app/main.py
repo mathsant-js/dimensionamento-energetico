@@ -5,11 +5,12 @@ from datetime import timedelta
 from typing import List
 
 from .database import Base, engine, SessionLocal
-from . import crud.user, crud.property
-from .schemas import user as user_schema, property as property_schema
+from .crud import property as property_crud, user as user_crud
+from . import schemas
 from .auth import authenticate_user, create_access_token, get_current_active_user
+from .schemas import user as user_schema, property as property_schema
 from .schemas.user import Token
-from .config import settings
+from .core.config import settings
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -28,11 +29,11 @@ app = FastAPI()
 @app.post("/users/", response_model=user_schema.UserRead)
 async def register_user(user: user_schema.UserCreate, db: Session = Depends(get_db)):
     # Check if email already exists
-    db_user = crud.user.get_user_by_email(db, user.email)
+    db_user = crud.user.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     # Create user (password will be hashed inside CRUD)
-    db_user = crud.user.create_user(db=db, user=user)
+    db_user = user_crud.create_user(db=db, user=user)
     return db_user
 
 
@@ -53,37 +54,37 @@ async def login_for_access_token(form_data: user_schema.UserLogin, db: Session =
 
 
 @app.get("/users/me/", response_model=user_schema.UserRead)
-async def read_users_me(current_user: user_schema.User = Depends(get_current_active_user)):
+async def read_users_me(current_user: user_schema.UserRead = Depends(get_current_active_user)):
     return current_user
 
 
 @app.post("/properties/", response_model=property_schema.PropertyRead)
 async def create_property(
     property: property_schema.PropertyCreate,
-    current_user: user_schema.User = Depends(get_current_active_user),
+    current_user: user_schema.UserRead = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    return crud.property.create_property(db=db, property=property, user_id=current_user.id)
+    return property_crud.create_property(db=db, property=property, user_id=current_user.id)
 
 
 @app.get("/properties/", response_model=List[property_schema.PropertyRead])
 async def read_properties(
     skip: int = 0,
     limit: int = 100,
-    current_user: user_schema.User = Depends(get_current_active_user),
+    current_user: user_schema.UserRead = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    properties = crud.property.get_properties_by_user(db, user_id=current_user.id, skip=skip, limit=limit)
+    properties = property_crud.get_properties_by_user(db, user_id=current_user.id, skip=skip, limit=limit)
     return properties
 
 
 @app.get("/properties/{property_id}", response_model=property_schema.PropertyRead)
 async def read_property(
     property_id: int,
-    current_user: user_schema.User = Depends(get_current_active_user),
+    current_user: user_schema.UserRead = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    db_property = crud.property.get_property(db, property_id=property_id, user_id=current_user.id)
+    db_property = property_crud.get_property(db, property_id=property_id, user_id=current_user.id)
     if db_property is None:
         raise HTTPException(status_code=404, detail="Property not found")
     return db_property
@@ -93,10 +94,10 @@ async def read_property(
 async def update_property(
     property_id: int,
     property: property_schema.PropertyUpdate,
-    current_user: user_schema.User = Depends(get_current_active_user),
+    current_user: user_schema.UserRead = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    db_property = crud.property.update_property(
+    db_property = property_crud.update_property(
         db, property_id=property_id, property=property, user_id=current_user.id
     )
     if db_property is None:
@@ -107,10 +108,10 @@ async def update_property(
 @app.delete("/properties/{property_id}")
 async def delete_property(
     property_id: int,
-    current_user: user_schema.User = Depends(get_current_active_user),
+    current_user: user_schema.UserRead = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    db_property = crud.property.delete_property(db, property_id=property_id, user_id=current_user.id)
+    db_property = property_crud.delete_property(db, property_id=property_id, user_id=current_user.id)
     if db_property is None:
         raise HTTPException(status_code=404, detail="Property not found")
     return {"message": "Property deleted successfully"}
