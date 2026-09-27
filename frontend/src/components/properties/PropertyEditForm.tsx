@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { PropertyUpdate, PropertyRead } from '../../types/property';
+import { PropertyUpdate, PropertyRead } from '../../types/property.ts';
 
 interface PropertyEditFormProps {
   property: PropertyRead;

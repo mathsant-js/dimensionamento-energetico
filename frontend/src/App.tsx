@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import axios from 'axios';
-import PropertyList from './components/properties/PropertyList';
+import PropertyList from './components/properties/PropertyList.tsx';
 import './App.css';
 
 function App() {
@@ -21,7 +21,7 @@ function App() {
     setLoginError(null);
     try {
       const response = await axios.post('/token', {
-        username: email, // OAuth2 expects 'username' field for email
+        email: email, // The API expects 'email' field
         password: password
       });
       const newToken = response.data.access_token;

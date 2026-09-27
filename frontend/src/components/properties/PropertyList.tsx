@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import PropertyEditForm from './PropertyEditForm';
-import PropertyDeleteModal from './PropertyDeleteModal';
-import { PropertyRead } from '../../types/property';
+import PropertyEditForm from './PropertyEditForm.tsx';
+import PropertyDeleteModal from './PropertyDeleteModal.tsx';
+import { PropertyRead } from '../../types/property.ts';
 
 interface PropertyListProps {
   token: string;
