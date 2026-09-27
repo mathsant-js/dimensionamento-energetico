@@ -14,7 +14,7 @@ def get_properties_by_user(db: Session, user_id: int, skip: int = 0, limit: int 
 
 def create_property(db: Session, property: schemas.PropertyCreate, user_id: int):
     db_property = models.Property(
-        **property.dict(),
+        **property.model_dump(),
         user_id=user_id
     )
     db.add(db_property)
@@ -25,7 +25,7 @@ def create_property(db: Session, property: schemas.PropertyCreate, user_id: int)
 def update_property(db: Session, property_id: int, property: schemas.PropertyUpdate, user_id: int):
     db_property = get_property(db, property_id, user_id)
     if db_property:
-        update_data = property.dict(exclude_unset=True)
+        update_data = property.model_dump(exclude_unset=True)
         for key, value in update_data.items():
             setattr(db_property, key, value)
         db.commit()

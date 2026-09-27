@@ -1,6 +1,10 @@
 export interface PropertyBase {
   identification: string;
   property_type: string;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zipcode?: string | null;
   latitude?: number | null;
   longitude?: number | null;
   built_area?: number | null;

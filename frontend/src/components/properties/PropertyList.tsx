@@ -1,32 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../api.ts';
 import PropertyEditForm from './PropertyEditForm.tsx';
 import PropertyDeleteModal from './PropertyDeleteModal.tsx';
 import { PropertyRead } from '../../types/property.ts';
 
 interface PropertyListProps {
   token: string;
+  refreshVersion: number;
+  onChanged: () => void;
 }
 
-const PropertyList: React.FC<PropertyListProps> = ({ token }) => {
+const PropertyList: React.FC<PropertyListProps> = ({ token, refreshVersion, onChanged }) => {
   const [properties, setProperties] = useState<PropertyRead[]>([]);
-  const [editingPropertyId, setEditingPropertyId] = useState<number | null>(null);
   const [deletingPropertyId, setDeletingPropertyId] = useState<number | null>(null);
+  const [editingPropertyId, setEditingPropertyId] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await axios.get<PropertyRead[]>('/properties/', {
+        const response = await api.get<PropertyRead[]>('/properties/', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setProperties(response.data);
-      } catch (error) {
-        console.error('Error fetching properties:', error);
+      } catch {
+        setError('Não foi possível carregar as propriedades.');
       }
     };
-
-    fetchProperties();
-  }, [token]);
+    void fetchProperties();
+  }, [token, refreshVersion]);
 
   const handleEdit = (propertyId: number) => {
     setEditingPropertyId(propertyId);
@@ -36,60 +39,72 @@ const PropertyList: React.FC<PropertyListProps> = ({ token }) => {
     setDeletingPropertyId(propertyId);
   };
 
-  const handleEditCancel = () => {
-    setEditingPropertyId(null);
-  };
-
   const handleDeleteCancel = () => {
     setDeletingPropertyId(null);
   };
 
+  const confirmDelete = async () => {
+    if (deletingPropertyId === null) return;
+    setIsDeleting(true);
+    setError(null);
+    try {
+      await api.delete(`/properties/${deletingPropertyId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setDeletingPropertyId(null);
+      onChanged();
+    } catch {
+      setError('Não foi possível excluir a propriedade.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
-    <div>
-      <h2>Minhas Propriedades</h2>
+    <section>
+      <div className="properties-header"><h2>Suas residências</h2><span className="eyebrow">{properties.length} cadastrada{properties.length === 1 ? '' : 's'}</span></div>
+      {error && <p className="alert" role="alert">{error}</p>}
       {properties.length === 0 ? (
-        <p>Você ainda não possui propriedades cadastradas.</p>
+        <div className="empty-state">Nenhuma residência cadastrada ainda.<br />Use “Nova residência” para começar.</div>
       ) : (
-        <ul>
+        <ul className="property-list">
           {properties.map((property) => (
-            <li key={property.id}>
+            <li className="property-card" key={property.id}>
+              <div className="property-card-top">
               <div>
                 <strong>{property.identification}</strong> ({property.property_type})
+                <p className="property-meta">Perfil energético em preparação</p>
               </div>
               {editingPropertyId === property.id ? (
                 <PropertyEditForm
                   property={property}
                   onSave={() => {
                     setEditingPropertyId(null);
-                    // Refetch properties after edit (optional, but we can do it)
-                    // For simplicity, we'll refetch after a short delay or rely on the update in the list via state
-                    // We'll refetch to be safe
-                    fetchProperties();
+                    onChanged();
                   }}
-                  onCancel={handleEditCancel}
+                  onCancel={() => setEditingPropertyId(null)}
+                  token={token}
                 />
               ) : (
                 <>
-                  <button onClick={() => handleEdit(property.id)}>Editar</button>
-                  <button onClick={() => handleDelete(property.id)}>Excluir</button>
+                  <div className="card-actions"><button className="secondary-button" onClick={() => handleEdit(property.id)}>Editar</button>
+                  <button className="danger-button" onClick={() => handleDelete(property.id)}>Excluir</button></div>
                 </>
               )}
+              </div>
+              {property.address && <p className="property-address">{property.address}{property.city ? `, ${property.city}` : ''}{property.state ? ` - ${property.state}` : ''}</p>}
               {deletingPropertyId === property.id && (
                 <PropertyDeleteModal
-                  propertyId={property.id}
-                  onConfirm={() => {
-                    setDeletingPropertyId(null);
-                    // Refetch after deletion
-                    fetchProperties();
-                  }}
+                  onConfirm={confirmDelete}
                   onCancel={handleDeleteCancel}
+                  isDeleting={isDeleting}
                 />
               )}
             </li>
           ))}
         </ul>
       )}
-    </div>
+    </section>
   );
 };
 

@@ -1,40 +1,36 @@
 import React, { useState } from 'react';
-import api from '../../api.ts';
-import { PropertyUpdate, PropertyRead } from '../../types/property.ts';
+import { PropertyCreate } from '../../types/property.ts';
 
-interface PropertyEditFormProps {
-  property: PropertyRead;
-  onSave: () => void;
+interface PropertyCreateFormProps {
+  onCreate: (propertyData: PropertyCreate) => Promise<void>;
   onCancel: () => void;
-  token: string;
+  isCreating?: boolean;
 }
 
-type PropertyFormData = Record<keyof PropertyUpdate, string>;
-
-const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, onCancel, token }) => {
-  const [formData, setFormData] = useState<PropertyFormData>({
-    identification: property.identification,
-    property_type: property.property_type,
-    address: property.address || '',
-    city: property.city || '',
-    state: property.state || '',
-    zipcode: property.zipcode || '',
-    latitude: property.latitude !== null && property.latitude !== undefined ? String(property.latitude) : '',
-    longitude: property.longitude !== null && property.longitude !== undefined ? String(property.longitude) : '',
-    built_area: property.built_area !== null && property.built_area !== undefined ? String(property.built_area) : '',
-    roof_area: property.roof_area !== null && property.roof_area !== undefined ? String(property.roof_area) : '',
-    orientation: property.orientation || '',
-    tilt_angle: property.tilt_angle !== null && property.tilt_angle !== undefined ? String(property.tilt_angle) : '',
+const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({ onCreate, onCancel, isCreating = false }) => {
+  const [formData, setFormData] = useState({
+    identification: '',
+    property_type: '',
+    address: '',
+    city: '',
+    state: '',
+    zipcode: '',
+    latitude: '',
+    longitude: '',
+    built_area: '',
+    roof_area: '',
+    orientation: '',
+    tilt_angle: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-    [name]: value,
+      [name]: value,
     }));
   };
 
@@ -44,18 +40,23 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
     setLoading(true);
 
     try {
-      const numericFields = new Set(['latitude', 'longitude', 'built_area', 'roof_area', 'tilt_angle']);
-      const updateData = Object.entries(formData).reduce((data, [key, value]) => {
-        if (value !== '') {
-          data[key as keyof PropertyUpdate] = numericFields.has(key) ? Number(value) : value;
-        }
-        return data;
-      }, {} as PropertyUpdate);
+      // Prepare data for API (convert empty strings to undefined for optional fields)
+      const propertyData: PropertyCreate = {
+        identification: formData.identification,
+        property_type: formData.property_type,
+        address: formData.address || undefined,
+        city: formData.city || undefined,
+        state: formData.state || undefined,
+        zipcode: formData.zipcode || undefined,
+        latitude: formData.latitude ? parseFloat(formData.latitude) : undefined,
+        longitude: formData.longitude ? parseFloat(formData.longitude) : undefined,
+        built_area: formData.built_area ? parseFloat(formData.built_area) : undefined,
+        roof_area: formData.roof_area ? parseFloat(formData.roof_area) : undefined,
+        orientation: formData.orientation || undefined,
+        tilt_angle: formData.tilt_angle ? parseFloat(formData.tilt_angle) : undefined,
+      };
 
-      await api.put(`/properties/${property.id}`, updateData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      onSave();
+      await onCreate(propertyData);
     } catch (error: any) {
       if (error.response?.data?.detail) {
         // Handle validation errors
@@ -82,14 +83,15 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
 
   return (
     <div className="form-card">
-      <h3>Editar residência</h3>
+      <h3>Nova residência</h3>
+      <p className="subtitle">Informe os detalhes disponíveis para criar o perfil do imóvel.</p>
       <form className="form-grid" onSubmit={handleSubmit}>
         <div>
           <label>Identificação:</label>
           <input
             type="text"
             name="identification"
-            value={formData.identification || ''}
+            value={formData.identification}
             onChange={handleChange}
             required
           />
@@ -101,7 +103,7 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
           <input
             type="text"
             name="property_type"
-            value={formData.property_type || ''}
+            value={formData.property_type}
             onChange={handleChange}
             required
           />
@@ -113,7 +115,7 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
           <input
             type="text"
             name="address"
-            value={formData.address || ''}
+            value={formData.address}
             onChange={handleChange}
           />
         </div>
@@ -123,7 +125,7 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
           <input
             type="text"
             name="city"
-            value={formData.city || ''}
+            value={formData.city}
             onChange={handleChange}
           />
         </div>
@@ -133,7 +135,7 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
           <input
             type="text"
             name="state"
-            value={formData.state || ''}
+            value={formData.state}
             onChange={handleChange}
           />
         </div>
@@ -143,7 +145,7 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
           <input
             type="text"
             name="zipcode"
-            value={formData.zipcode || ''}
+            value={formData.zipcode}
             onChange={handleChange}
           />
         </div>
@@ -154,7 +156,7 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
             type="number"
             step="any"
             name="latitude"
-            value={formData.latitude || ''}
+            value={formData.latitude}
             onChange={handleChange}
           />
         </div>
@@ -165,7 +167,7 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
             type="number"
             step="any"
             name="longitude"
-            value={formData.longitude || ''}
+            value={formData.longitude}
             onChange={handleChange}
           />
         </div>
@@ -176,7 +178,7 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
             type="number"
             step="any"
             name="built_area"
-            value={formData.built_area || ''}
+            value={formData.built_area}
             onChange={handleChange}
           />
         </div>
@@ -187,7 +189,7 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
             type="number"
             step="any"
             name="roof_area"
-            value={formData.roof_area || ''}
+            value={formData.roof_area}
             onChange={handleChange}
           />
         </div>
@@ -197,7 +199,7 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
           <input
             type="text"
             name="orientation"
-            value={formData.orientation || ''}
+            value={formData.orientation}
             onChange={handleChange}
           />
         </div>
@@ -208,7 +210,7 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
             type="number"
             step="any"
             name="tilt_angle"
-            value={formData.tilt_angle || ''}
+            value={formData.tilt_angle}
             onChange={handleChange}
           />
         </div>
@@ -221,7 +223,7 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
         
         <div className="form-actions full-width">
           <button type="submit" disabled={loading}>
-            {loading ? 'Salvando...' : 'Salvar'}
+            {loading ? 'Criando...' : 'Criar Propriedade'}
           </button>
           <button className="secondary-button" type="button" onClick={onCancel}>
             Cancelar
@@ -232,4 +234,4 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
   );
 };
 
-export default PropertyEditForm;
+export default PropertyCreateForm;

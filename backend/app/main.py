@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import Generator
 from datetime import timedelta
@@ -25,11 +26,19 @@ def get_db() -> Generator[Session, None, None]:
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.post("/users/", response_model=user_schema.UserRead)
 async def register_user(user: user_schema.UserCreate, db: Session = Depends(get_db)):
     # Check if email already exists
-    db_user = crud.user.get_user_by_email(db, email=user.email)
+    db_user = user_crud.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     # Create user (password will be hashed inside CRUD)
