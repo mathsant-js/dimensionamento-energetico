@@ -1,9 +1,9 @@
 # Dimensionamento Energético
 
-![GitHub](https://img.shields.io/github/license/mathsant/dimensionamento-energetico)
-![GitHub top language](https://img.shields.io/github/languages/top/mathsant/dimensionamento-energetico)
-![GitHub repo size](https://img.shields.io/github/repo-size/mathsant/dimensionamento-energetico)
-![GitHub last commit](https://img.shields.io/github/last-commit/mathsant/dimensionamento-energetico)
+![GitHub](https://img.shields.io/github/license/mathsant-js/dimensionamento-energetico)
+![GitHub top language](https://img.shields.io/github/languages/top/mathsant-js/dimensionamento-energetico)
+![GitHub repo size](https://img.shields.io/github/repo-size/mathsant-js/dimensionamento-energetico)
+![GitHub last commit](https://img.shields.io/github/last-commit/mathsant-js/dimensionamento-energetico)
 
 ## Índice
 
@@ -166,11 +166,11 @@ Estas credenciais criam automaticamente um usuário de teste com uma propriedade
 
 ## Pessoas Contribuidoras
 
-- [Mathsant](https://github.com/mathsant) - Desenvolvedor principal
+- [mathsant-js](https://github.com/mathsant-js) - Scrum Master e Desenvolvedor
 
 ## Pessoas Desenvolvedoras do Projeto
 
-- **Mathsant** - Concepção, desenvolvimento backend e frontend, testes e documentação
+- **mathsant-js** - Concepção, desenvolvimento backend e frontend, testes e documentação
 
 ## Licença
 
