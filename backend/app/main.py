@@ -1,20 +1,28 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from typing import Generator
+from typing import Generator, List
 from datetime import timedelta
 from typing import List
 
 from .database import Base, engine, SessionLocal
-from .crud import property as property_crud, user as user_crud
-from . import schemas
+from .crud import property as property_crud, user as user_crud, equipment as equipment_crud
+from . import schemas, models
+from .seed import seed_equipments
 from .auth import authenticate_user, create_access_token, get_current_active_user
-from .schemas import user as user_schema, property as property_schema
+from .schemas import user as user_schema, property as property_schema, equipment as equipment_schema
 from .schemas.user import Token
 from .core.config import settings
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
+
+# Seed equipments
+db = SessionLocal()
+try:
+    seed_equipments(db)
+finally:
+    db.close()
 
 # Dependency to get DB session
 def get_db() -> Generator[Session, None, None]:
@@ -124,3 +132,125 @@ async def delete_property(
     if db_property is None:
         raise HTTPException(status_code=404, detail="Property not found")
     return {"message": "Property deleted successfully"}
+
+
+# Equipment Endpoints
+
+@app.get("/equipments/", response_model=List[equipment_schema.EquipmentRead])
+async def read_equipments(
+    skip: int = 0,
+    limit: int = 100,
+    current_user: user_schema.UserRead = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    equipments = equipment_crud.get_all_equipments(db, skip=skip, limit=limit)
+    return equipments
+
+
+@app.post("/equipments/", response_model=equipment_schema.EquipmentRead)
+async def create_equipment_endpoint(
+    equipment: equipment_schema.EquipmentCreate,
+    current_user: user_schema.UserRead = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    return equipment_crud.create_equipment(db, equipment)
+
+
+# Property Equipment (Consumption) Endpoints
+
+@app.get("/properties/{property_id}/equipments/", response_model=List[equipment_schema.PropertyEquipmentWithDetailsRead])
+async def read_property_equipments(
+    property_id: int,
+    current_user: user_schema.UserRead = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    # Verify property belongs to user
+    db_property = property_crud.get_property(db, property_id=property_id, user_id=current_user.id)
+    if db_property is None:
+        raise HTTPException(status_code=404, detail="Property not found")
+    
+    return equipment_crud.get_property_equipments(db, property_id=property_id)
+
+
+@app.post("/properties/{property_id}/equipments/", response_model=equipment_schema.PropertyEquipmentRead)
+async def create_property_equipment(
+    property_id: int,
+    property_equipment: equipment_schema.PropertyEquipmentCreate,
+    current_user: user_schema.UserRead = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    # Verify property belongs to user
+    db_property = property_crud.get_property(db, property_id=property_id, user_id=current_user.id)
+    if db_property is None:
+        raise HTTPException(status_code=404, detail="Property not found")
+    
+    # Verify equipment exists
+    equipment = equipment_crud.get_equipment(db, property_equipment.equipment_id)
+    if equipment is None:
+        raise HTTPException(status_code=404, detail="Equipment not found")
+    
+    return equipment_crud.create_property_equipment(db, property_id, property_equipment)
+
+
+@app.put("/properties/{property_id}/equipments/{equipment_id}", response_model=equipment_schema.PropertyEquipmentRead)
+async def update_property_equipment(
+    property_id: int,
+    equipment_id: int,
+    property_equipment: equipment_schema.PropertyEquipmentUpdate,
+    current_user: user_schema.UserRead = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    # Verify property belongs to user
+    db_property = property_crud.get_property(db, property_id=property_id, user_id=current_user.id)
+    if db_property is None:
+        raise HTTPException(status_code=404, detail="Property not found")
+    
+    # Find and update the property equipment
+    db_property_equipment = db.query(models.PropertyEquipment).filter(
+        models.PropertyEquipment.id == equipment_id,
+        models.PropertyEquipment.property_id == property_id
+    ).first()
+    
+    if db_property_equipment is None:
+        raise HTTPException(status_code=404, detail="Equipment not found for this property")
+    
+    return equipment_crud.update_property_equipment(db, equipment_id, property_equipment)
+
+
+@app.delete("/properties/{property_id}/equipments/{equipment_id}")
+async def delete_property_equipment(
+    property_id: int,
+    equipment_id: int,
+    current_user: user_schema.UserRead = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    # Verify property belongs to user
+    db_property = property_crud.get_property(db, property_id=property_id, user_id=current_user.id)
+    if db_property is None:
+        raise HTTPException(status_code=404, detail="Property not found")
+    
+    # Find and delete the property equipment
+    db_property_equipment = db.query(models.PropertyEquipment).filter(
+        models.PropertyEquipment.id == equipment_id,
+        models.PropertyEquipment.property_id == property_id
+    ).first()
+    
+    if db_property_equipment is None:
+        raise HTTPException(status_code=404, detail="Equipment not found for this property")
+    
+    equipment_crud.delete_property_equipment(db, equipment_id)
+    return {"message": "Equipment removed from property successfully"}
+
+
+# Consumption Report Endpoint
+
+@app.get("/properties/{property_id}/consumption-report", response_model=equipment_schema.ConsumptionReport)
+async def get_property_consumption_report(
+    property_id: int,
+    current_user: user_schema.UserRead = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    report = equipment_crud.get_consumption_report(db, property_id=property_id, user_id=current_user.id)
+    if report is None:
+        raise HTTPException(status_code=404, detail="Property not found")
+    return report

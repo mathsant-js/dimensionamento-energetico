@@ -1,0 +1,247 @@
+.consumption-report-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+  padding: 32px;
+  margin: 24px 0;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.consumption-report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.consumption-report-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.report-subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  text-transform: capitalize;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.report-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.equipments-section h3 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.equipments-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.equipments-table thead {
+  background: #f9f9f9;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.equipments-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+.equipments-table tbody tr {
+  border-bottom: 1px solid #e0e0e0;
+  transition: background 0.2s ease;
+}
+
+.equipments-table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+.equipments-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.equipments-table td {
+  padding: 12px 16px;
+  color: #333;
+}
+
+.equipments-table td.numeric {
+  text-align: right;
+  font-family: 'Courier New', monospace;
+}
+
+.equipments-table td.consumption {
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.equipment-name {
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.summary-section {
+  background: #f0f8ff;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.summary-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-item.total {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  padding: 16px;
+  border-radius: 6px;
+}
+
+.summary-label {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #666;
+}
+
+.summary-item.total .summary-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.summary-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.summary-item.total .summary-value {
+  color: white;
+}
+
+.total-value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.empty-state p {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #666;
+}
+
+.empty-state .subtitle {
+  margin: 8px 0 0 0;
+  font-size: 14px;
+  color: #999;
+}
+
+.alert {
+  padding: 16px;
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 6px;
+  color: #c00;
+  margin-bottom: 16px;
+}
+
+.actions-section {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+@media (max-width: 768px) {
+  .consumption-report-container {
+    padding: 20px;
+  }
+
+  .consumption-report-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .close-button {
+    align-self: flex-end;
+  }
+
+  .summary-card {
+    grid-template-columns: 1fr;
+  }
+
+  .equipments-table {
+    font-size: 12px;
+  }
+
+  .equipments-table th,
+  .equipments-table td {
+    padding: 8px 12px;
+  }
+
+  .summary-value {
+    font-size: 20px;
+  }
+}
