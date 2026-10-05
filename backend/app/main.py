@@ -169,7 +169,7 @@ async def read_property_equipments(
     if db_property is None:
         raise HTTPException(status_code=404, detail="Property not found")
     
-    return equipment_crud.get_property_equipments(db, property_id=property_id)
+    return equipment_crud.get_property_equipments(db, property_id=property_id, user_id=current_user.id)
 
 
 @app.post("/properties/{property_id}/equipments/", response_model=equipment_schema.PropertyEquipmentRead)
@@ -189,7 +189,10 @@ async def create_property_equipment(
     if equipment is None:
         raise HTTPException(status_code=404, detail="Equipment not found")
     
-    return equipment_crud.create_property_equipment(db, property_id, property_equipment)
+    created = equipment_crud.create_property_equipment(db, property_id, property_equipment, user_id=current_user.id)
+    if created is None:
+        raise HTTPException(status_code=404, detail="Property not found")
+    return created
 
 
 @app.put("/properties/{property_id}/equipments/{equipment_id}", response_model=equipment_schema.PropertyEquipmentRead)
@@ -214,7 +217,10 @@ async def update_property_equipment(
     if db_property_equipment is None:
         raise HTTPException(status_code=404, detail="Equipment not found for this property")
     
-    return equipment_crud.update_property_equipment(db, equipment_id, property_equipment)
+    updated = equipment_crud.update_property_equipment(db, equipment_id, property_equipment, user_id=current_user.id)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Equipment not found for this property")
+    return updated
 
 
 @app.delete("/properties/{property_id}/equipments/{equipment_id}")
@@ -238,7 +244,9 @@ async def delete_property_equipment(
     if db_property_equipment is None:
         raise HTTPException(status_code=404, detail="Equipment not found for this property")
     
-    equipment_crud.delete_property_equipment(db, equipment_id)
+    deleted = equipment_crud.delete_property_equipment(db, equipment_id, user_id=current_user.id)
+    if deleted is None:
+        raise HTTPException(status_code=404, detail="Equipment not found for this property")
     return {"message": "Equipment removed from property successfully"}
 
 

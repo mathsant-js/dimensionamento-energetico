@@ -27,16 +27,33 @@ def get_property_equipment(db: Session, property_equipment_id: int):
         models.PropertyEquipment.id == property_equipment_id
     ).first()
 
-def get_property_equipments(db: Session, property_id: int, skip: int = 0, limit: int = 100):
-    return db.query(models.PropertyEquipment).filter(
+def get_property_equipments(db: Session, property_id: int, user_id: int, skip: int = 0, limit: int = 100):
+    query = db.query(models.PropertyEquipment).join(
+        models.Property,
+        models.Property.id == models.PropertyEquipment.property_id
+    ).filter(
         models.PropertyEquipment.property_id == property_id
-    ).offset(skip).limit(limit).all()
+    )
+
+    if user_id is not None:
+        query = query.filter(models.Property.user_id == user_id)
+
+    return query.offset(skip).limit(limit).all()
 
 def create_property_equipment(
     db: Session, 
     property_id: int, 
-    property_equipment: schemas.PropertyEquipmentCreate
+    property_equipment: schemas.PropertyEquipmentCreate,
+    user_id: int
 ):
+    if user_id is not None:
+        property_obj = db.query(models.Property).filter(
+            models.Property.id == property_id,
+            models.Property.user_id == user_id
+        ).first()
+        if property_obj is None:
+            return None
+
     db_property_equipment = models.PropertyEquipment(
         property_id=property_id,
         **property_equipment.model_dump()
@@ -49,9 +66,18 @@ def create_property_equipment(
 def update_property_equipment(
     db: Session,
     property_equipment_id: int,
-    property_equipment: schemas.PropertyEquipmentUpdate
+    property_equipment: schemas.PropertyEquipmentUpdate,
+    user_id: int
 ):
     db_property_equipment = get_property_equipment(db, property_equipment_id)
+    if db_property_equipment and user_id is not None:
+        property_obj = db.query(models.Property).filter(
+            models.Property.id == db_property_equipment.property_id,
+            models.Property.user_id == user_id
+        ).first()
+        if property_obj is None:
+            return None
+
     if db_property_equipment:
         update_data = property_equipment.model_dump(exclude_unset=True)
         for key, value in update_data.items():
@@ -60,8 +86,16 @@ def update_property_equipment(
         db.refresh(db_property_equipment)
     return db_property_equipment
 
-def delete_property_equipment(db: Session, property_equipment_id: int):
+def delete_property_equipment(db: Session, property_equipment_id: int, user_id: int):
     db_property_equipment = get_property_equipment(db, property_equipment_id)
+    if db_property_equipment and user_id is not None:
+        property_obj = db.query(models.Property).filter(
+            models.Property.id == db_property_equipment.property_id,
+            models.Property.user_id == user_id
+        ).first()
+        if property_obj is None:
+            return None
+
     if db_property_equipment:
         db.delete(db_property_equipment)
         db.commit()
