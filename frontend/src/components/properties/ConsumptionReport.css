@@ -358,6 +358,10 @@
   color: #999;
 }
 
+.empty-state button {
+  margin-top: 16px;
+}
+
 .alert {
   padding: 16px;
   background: #fee;

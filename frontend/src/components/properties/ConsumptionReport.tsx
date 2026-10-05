@@ -8,6 +8,7 @@ interface ConsumptionReportProps {
   propertyId: number;
   propertyName: string;
   onClose: () => void;
+  onManageEquipment: () => void;
   token: string;
 }
 
@@ -19,6 +20,7 @@ const ConsumptionReportComponent: React.FC<ConsumptionReportProps> = ({
   propertyId,
   propertyName,
   onClose,
+  onManageEquipment,
   token,
 }) => {
   const [report, setReport] = useState<ConsumptionReport | null>(null);
@@ -82,8 +84,9 @@ const ConsumptionReportComponent: React.FC<ConsumptionReportProps> = ({
         <div className="empty-state">
           <p>Nenhum equipamento cadastrado para esta propriedade ainda.</p>
           <p className="subtitle">Adicione equipamentos para gerar o relatório de consumo.</p>
+          <button onClick={onManageEquipment}>Adicionar primeiro equipamento</button>
         </div>
-        <button className="secondary-button" onClick={onClose}>Voltar</button>
+        <section className="actions-section"><button className="secondary-button" onClick={onClose}>Voltar</button></section>
       </div>
     );
   }
@@ -123,7 +126,7 @@ const ConsumptionReportComponent: React.FC<ConsumptionReportProps> = ({
               <h3>Maior Consumidor</h3>
               <p className="highest-consumer-name">{highestConsumer.equipment_name}</p>
               <p className="highest-consumer-value">
-                {highestConsumer.monthly_consumption_kwh.toFixed(2)} kWh/mês
+                {formatMonthlyConsumption(highestConsumer.monthly_consumption_kwh)}
                 <span className="highest-consumer-percentage">
                   ({((highestConsumer.monthly_consumption_kwh / report.total_monthly_consumption_kwh) * 100).toFixed(1)}% do total)
                 </span>
@@ -218,7 +221,7 @@ const ConsumptionReportComponent: React.FC<ConsumptionReportProps> = ({
             <div className="summary-item total">
               <span className="summary-label">Consumo Total Mensal</span>
               <span className="summary-value total-value">
-                {report.total_monthly_consumption_kwh.toFixed(2)} kWh
+                {formatMonthlyConsumption(report.total_monthly_consumption_kwh)}
               </span>
             </div>
           </div>
@@ -226,6 +229,7 @@ const ConsumptionReportComponent: React.FC<ConsumptionReportProps> = ({
 
         <section className="actions-section">
           <button className="secondary-button" onClick={onClose}>Voltar</button>
+          <button onClick={onManageEquipment}>Gerenciar equipamentos</button>
         </section>
       </div>
     </div>

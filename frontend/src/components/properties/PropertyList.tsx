@@ -80,6 +80,10 @@ const PropertyList: React.FC<PropertyListProps> = ({ token, refreshVersion, onCh
           propertyId={viewingReportPropertyId}
           propertyName={property.identification}
           onClose={() => setViewingReportPropertyId(null)}
+          onManageEquipment={() => {
+            setViewingReportPropertyId(null);
+            setManagingEquipmentPropertyId(viewingReportPropertyId);
+          }}
           token={token}
         />
       );
