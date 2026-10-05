@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../api.ts';
-import { Equipment, PropertyEquipmentWithDetails } from '../../types/equipment.ts';
+import { Equipment, PropertyEquipment, PropertyEquipmentWithDetails } from '../../types/equipment.ts';
 
 interface PropertyEquipmentManagerProps {
   propertyId: number;
@@ -8,6 +8,29 @@ interface PropertyEquipmentManagerProps {
   token: string;
   onClose: () => void;
 }
+
+const validateUsage = (quantity: string, hoursPerDay: string): string | null => {
+  const parsedQuantity = Number(quantity);
+  const parsedHours = Number(hoursPerDay);
+
+  if (!Number.isInteger(parsedQuantity) || parsedQuantity <= 0) {
+    return 'A quantidade deve ser um número inteiro maior que zero.';
+  }
+  if (!Number.isFinite(parsedHours) || parsedHours < 0 || parsedHours > 24) {
+    return 'As horas de uso devem estar entre 0 e 24.';
+  }
+  return null;
+};
+
+const getRequestErrorMessage = (requestError: any, fallback: string) => {
+  if (requestError.response?.status === 409) {
+    return 'Este equipamento já está vinculado a esta residência.';
+  }
+  const detail = requestError.response?.data?.detail;
+  if (typeof detail === 'string') return detail;
+  if (Array.isArray(detail)) return detail.map((item) => item.msg).filter(Boolean).join(' ');
+  return fallback;
+};
 
 const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
   propertyId,
@@ -23,6 +46,9 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editingEquipmentId, setEditingEquipmentId] = useState<number | null>(null);
+  const [editQuantity, setEditQuantity] = useState('');
+  const [editHoursPerDay, setEditHoursPerDay] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,11 +81,16 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
       setError('Selecione um equipamento para adicionar.');
       return;
     }
+    const validationError = validateUsage(quantity, hoursPerDay);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
 
     setIsSaving(true);
     setError(null);
     try {
-      const response = await api.post<PropertyEquipmentWithDetails>(
+      const response = await api.post<PropertyEquipment>(
         `/properties/${propertyId}/equipments/`,
         {
           equipment_id: Number(equipmentId),
@@ -76,9 +107,47 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
       setQuantity('1');
       setHoursPerDay('1');
     } catch (requestError: any) {
-      setError(requestError.response?.status === 409
-        ? 'Este equipamento já está vinculado a esta residência.'
-        : 'Não foi possível adicionar o equipamento. Verifique os dados informados.');
+      setError(getRequestErrorMessage(requestError, 'Não foi possível adicionar o equipamento.'));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const startEditing = (item: PropertyEquipmentWithDetails) => {
+    setError(null);
+    setEditingEquipmentId(item.id);
+    setEditQuantity(String(item.quantity));
+    setEditHoursPerDay(String(item.hours_per_day));
+  };
+
+  const cancelEditing = () => {
+    setEditingEquipmentId(null);
+    setEditQuantity('');
+    setEditHoursPerDay('');
+  };
+
+  const handleUpdate = async (event: React.FormEvent<HTMLFormElement>, item: PropertyEquipmentWithDetails) => {
+    event.preventDefault();
+    const validationError = validateUsage(editQuantity, editHoursPerDay);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setIsSaving(true);
+    setError(null);
+    try {
+      const response = await api.put<PropertyEquipment>(
+        `/properties/${propertyId}/equipments/${item.id}`,
+        { quantity: Number(editQuantity), hours_per_day: Number(editHoursPerDay) },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setLinkedEquipments((items) => items.map((linkedItem) => (
+        linkedItem.id === item.id ? { ...linkedItem, ...response.data } : linkedItem
+      )));
+      cancelEditing();
+    } catch (requestError: any) {
+      setError(getRequestErrorMessage(requestError, 'Não foi possível atualizar o equipamento.'));
     } finally {
       setIsSaving(false);
     }
@@ -111,13 +180,14 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
             </div>
             <div className="field">
               <label htmlFor="equipment-quantity">Quantidade</label>
-              <input id="equipment-quantity" type="number" min="1" step="1" required value={quantity} onChange={(event) => setQuantity(event.target.value)} />
+              <input id="equipment-quantity" type="number" min="1" step="1" required value={quantity} onChange={(event) => setQuantity(event.target.value)} aria-describedby="usage-help" />
             </div>
             <div className="field">
               <label htmlFor="equipment-hours">Horas de uso por dia</label>
-              <input id="equipment-hours" type="number" min="0" max="24" step="0.1" required value={hoursPerDay} onChange={(event) => setHoursPerDay(event.target.value)} />
+              <input id="equipment-hours" type="number" min="0" max="24" step="0.1" required value={hoursPerDay} onChange={(event) => setHoursPerDay(event.target.value)} aria-describedby="usage-help" />
             </div>
           </div>
+          <p id="usage-help" className="field-help">Quantidade deve ser inteira e maior que zero. As horas podem variar de 0 a 24.</p>
           <div className="form-actions"><button type="submit" disabled={isSaving || availableEquipments.length === 0}>{isSaving ? 'Adicionando...' : 'Adicionar equipamento'}</button></div>
         </form>
 
@@ -127,9 +197,20 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
         ) : (
           <ul className="equipment-list">
             {linkedEquipments.map((item) => (
-              <li className="equipment-card" key={item.id}>
-                <div><h2>{item.equipment.name}</h2><p>{item.equipment.category} · {item.quantity} unidade{item.quantity === 1 ? '' : 's'} · {item.hours_per_day} h/dia</p></div>
-                <strong>{item.equipment.power_watts} W</strong>
+              <li className={`equipment-card ${editingEquipmentId === item.id ? 'equipment-card-editing' : ''}`} key={item.id}>
+                {editingEquipmentId === item.id ? (
+                  <form className="equipment-edit-form" onSubmit={(event) => handleUpdate(event, item)}>
+                    <div><h2>{item.equipment.name}</h2><p>{item.equipment.category}</p></div>
+                    <div className="equipment-edit-fields">
+                      <label>Quantidade<input type="number" min="1" step="1" required value={editQuantity} onChange={(event) => setEditQuantity(event.target.value)} /></label>
+                      <label>Horas/dia<input type="number" min="0" max="24" step="0.1" required value={editHoursPerDay} onChange={(event) => setEditHoursPerDay(event.target.value)} /></label>
+                    </div>
+                    <div className="card-actions"><button type="button" className="secondary-button" onClick={cancelEditing} disabled={isSaving}>Cancelar</button><button type="submit" disabled={isSaving}>{isSaving ? 'Salvando...' : 'Salvar'}</button></div>
+                  </form>
+                ) : <>
+                  <div><h2>{item.equipment.name}</h2><p>{item.equipment.category} · {item.quantity} unidade{item.quantity === 1 ? '' : 's'} · {item.hours_per_day} h/dia</p></div>
+                  <div className="equipment-card-actions"><strong>{item.equipment.power_watts} W</strong><button className="secondary-button" onClick={() => startEditing(item)}>Editar uso</button></div>
+                </>}
               </li>
             ))}
           </ul>
