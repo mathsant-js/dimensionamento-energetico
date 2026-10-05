@@ -5,173 +5,125 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/mathsant-js/dimensionamento-energetico)
 ![GitHub last commit](https://img.shields.io/github/last-commit/mathsant-js/dimensionamento-energetico)
 
-## Índice
+Sistema web para estimar o consumo mensal de energia de residências. O usuário cadastra seus imóveis, vincula equipamentos de um catálogo predefinido e acompanha o consumo total, a participação de cada equipamento e o maior consumidor estimado.
 
-- [Dimensionamento Energético](#dimensionamento-energético)
-  - [Índice](#índice)
-  - [Título](#título)
-  - [Descrição do Projeto](#descrição-do-projeto)
-  - [Status do Projeto](#status-do-projeto)
-  - [Funcionalidades e Demonstração da Aplicação](#funcionalidades-e-demonstração-da-aplicação)
-    - [Funcionalidades do Usuário](#funcionalidades-do-usuário)
-    - [Funcionalidades do Sistema](#funcionalidades-do-sistema)
-    - [Funcionalidades Avançadas de Dimensionamento Fotovoltaico (Futuras)](#funcionalidades-avançadas-de-dimensionamento-fotovoltaico-futuras)
-  - [Acesso ao Projeto](#acesso-ao-projeto)
-  - [Como rodar o projeto](#como-rodar-o-projeto)
-    - [Pré-requisitos](#pré-requisitos)
-    - [Passo a passo para execução local](#passo-a-passo-para-execução-local)
-    - [Credenciais de acesso padrão](#credenciais-de-acesso-padrão)
-  - [Tecnologias utilizadas](#tecnologias-utilizadas)
-    - [Backend](#backend)
-    - [Frontend](#frontend)
-    - [Ferramentas de Desenvolvimento](#ferramentas-de-desenvolvimento)
-  - [Pessoas Contribuidoras](#pessoas-contribuidoras)
-  - [Pessoas Desenvolvedoras do Projeto](#pessoas-desenvolvedoras-do-projeto)
-  - [Licença](#licença)
+Desenvolvido como projeto acadêmico da FIAP.
 
-## Título
+## Sumário
 
-Dimensionamento Energético - Sistema de Estimativa de Consumo Residencial e Dimensionamento de Sistemas Fotovoltaicos
+- [Funcionalidades implementadas](#funcionalidades-implementadas)
+- [Escopo futuro](#escopo-futuro)
+- [Arquitetura](#arquitetura)
+- [Execução local](#execução-local)
+- [Pré-requisitos](#pré-requisitos)
+- [Backend](#backend)
+- [Frontend](#frontend)
+- [Configuração opcional](#configuração-opcional)
+- [Primeiro acesso](#primeiro-acesso)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Validação](#validação)
+- [Licença](#licença)
 
-## Descrição do Projeto
+## Funcionalidades implementadas
 
-O **Dimensionamento Energético** é um sistema completo para estimativa de consumo energético residencial e dimensionamento de sistemas fotovoltaicos. O projeto permite que usuários cadastrem suas propriedades, informem os eletrodomésticos presentes, definam padrões de utilização e obtenham estimativas detalhadas de consumo mensal. Além disso, o sistema inclui funcionalidades para dimensionamento automático de sistemas solares fotovoltaicos, incluindo cálculo de painéis necessários, seleção de inversores, opcional inclusão de sistemas de armazenamento em baterias e geração de proposta financeira preliminar.
+- Cadastro e autenticação de usuários com JWT.
+- Cadastro, edição, listagem e exclusão de residências.
+- Catálogo predefinido de 20 equipamentos com potência nominal em watts.
+- Vínculo de equipamentos a uma residência com quantidade e horas de uso diário.
+- Validações para campos obrigatórios, quantidade maior que zero e uso entre 0 e 24 horas.
+- Cálculo do consumo mensal por equipamento: `(potencia_watts x quantidade x horas_dia x 30) / 1000`.
+- Total mensal calculado pelo backend.
+- Relatório com tabela detalhada, maior consumidor, percentuais e gráficos de pizza e barras.
+- Isolamento dos dados por usuário autenticado.
+- Persistência em SQLite via SQLAlchemy.
 
-Este sistema foi desenvolvido como parte de um projeto acadêmico da FIAP, atendendo às necessidades de profissionais de energia solar, consumidores residenciais interessados em energia renovável e estudantes da área de engenharia e sustentabilidade.
+## Escopo futuro
 
-## Status do Projeto
+O projeto também possui especificações para evolução de dimensionamento fotovoltaico, incluindo seleção de módulos e inversores, armazenamento em baterias e orçamento. Esses recursos ainda não estão implementados no aplicativo atual. Consulte `AGENTS.md` e `SPEC.md` para o escopo planejado.
 
-**Em andamento** - Projeto em desenvolvimento
+## Arquitetura
 
-## Funcionalidades e Demonstração da Aplicação
+- **Frontend:** React 19, TypeScript, Axios, Recharts e Create React App.
+- **Backend:** Python 3.10+, FastAPI, Pydantic, SQLAlchemy, python-jose e Passlib.
+- **Banco de dados:** SQLite por padrão.
+- **API:** REST com documentação Swagger em `/docs`.
 
-### Funcionalidades do Usuário
-
-- ✅ Cadastro de usuário com autenticação segura
-- ✅ Login com JWT tokens
-- ✅ Cadastro de propriedades residenciais com identificação, tipo e localização
-- ✅ Visualização de catálogo de equipamentos elétricos com potência (W)
-- ✅ Associação de eletrodomésticos a propriedades específicas
-- ✅ Definição de tempo médio diário de utilização para cada equipamento (0-24h)
-- ✅ Cálculo individual de consumo mensal de cada equipamento
-- ✅ Agregação do consumo total mensal do imóvel
-- ✅ Edição de dados de propriedades cadastradas
-- ✅ Exclusão de propriedades com confirmação modal
-- ✅ Visualização de todas as propriedades cadastradas pelo usuário
-
-### Funcionalidades do Sistema
-
-- ✅ Base de dados predefinida com nome, categoria e potência de equipamentos elétricos
-- ✅ Cálculo automático do consumo mensal de cada equipamento: `(Potência × Quantidade × Horas/dia × 30) / 1000`
-- ✅ Cálculo do consumo total mensal do imóvel
-- ✅ Validação de dados de entrada (campos obrigatórios, faixas de valores)
-- ✅ Isolamento de dados por usuário (cada usuário vê apenas suas propriedades)
-- ✅ Persistência de dados em banco de dados SQLite
-- ✅ API RESTful com documentação automática Swagger
-- ✅ Interface web responsiva construída com React e TypeScript
-
-### Funcionalidades Avançadas de Dimensionamento Fotovoltaico (Futuras)
-
-- ✅ Cálculo automático da geração necessária com base no consumo e taxa de compensação desejada
-- ✅ Dimensionamento da potência necessária do sistema PV considerando HSP local
-- ✅ Seleção automática de módulos fotovoltaicos compatíveis
-- ✅ Seleção de inversores com validação técnica (tensão, corrente, potência máxima)
-- ✅ Cálculo opcional de sistema de armazenamento em baterias (BESS)
-- ✅ Geração de proposta financeira com custos estimados
-
-## Acesso ao Projeto
-
-O projeto está disponível em: https://github.com/mathsant/dimensionamento-energetico
-
-Para acessar diretamente:
-- **Frontend**: http://localhost:3000 (quando em execução local)
-- **Backend API**: http://localhost:8000 (quando em execução local)
-- **Documentação da API**: http://localhost:8000/docs (interface Swagger)
-
-## Como rodar o projeto
+## Execução local
 
 ### Pré-requisitos
 
-- Node.js (versão 16 ou superior)
-- Python (versão 3.10 ou superior)
-- npm ou yarn
-- Git
-
-### Passo a passo para execução local
-
-1. **Clone o repositório**
-   ```bash
-   git clone https://github.com/mathsant/dimensionamento-energetico.git
-   cd dimensionamento-energetico
-   ```
-
-2. **Configure e execute o backend**
-   ```bash
-   cd backend
-   
-   # Instale as dependências
-   pip install -r requirements.txt
-   
-   # Execute o servidor API
-   python3 -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-   ```
-   
-   O backend estará disponível em http://localhost:8000
-   A documentação automática da API em http://localhost:8000/docs
-
-3. **Configure e execute o frontend**
-   ```bash
-   # Em outro terminal, na raiz do projeto:
-   cd frontend
-   
-   # Instale as dependências
-   npm install
-   
-   # Execute o aplicativo
-   npm start
-   ```
-   
-   O frontend estará disponível em http://localhost:3000
-
-### Credenciais de acesso padrão
-
-Para testes iniciais, use:
-- **Email**: test@example.com
-- **Senha**: testpassword123
-
-Estas credenciais criam automaticamente um usuário de teste com uma propriedade de exemplo cadastrada.
-
-## Tecnologias utilizadas
+- Node.js 18 ou superior.
+- Python 3.10 ou superior.
+- npm.
 
 ### Backend
-- **Python 3.10+** - Linguagem de programação principal
-- **FastAPI** - Framework web moderno e rápido para construção de APIs
-- **SQLAlchemy** - ORM para interação com banco de dados
-- **Pydantic** - Validação de dados e configurações
-- **JWT (PyJWT)** - Autenticação baseada em tokens
-- **Passlib** - Hash seguro de senhas
-- **Uvicorn** - Servidor ASGI para produção
-- **SQLite** - Banco de dados embutido para desenvolvimento
+
+Em um terminal, a partir da raiz do repositório:
+
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+O backend inicia em `http://localhost:8000`, e a documentação interativa fica em `http://localhost:8000/docs`.
 
 ### Frontend
-- **React 18** - Biblioteca JavaScript para construção de interfaces
-- **TypeScript** - Superset tipado do JavaScript
-- **Axios** - Cliente HTTP para comunicação com a API
-- **React-scripts** - Ferramentas de build e desenvolvimento do Create React App
 
-### Ferramentas de Desenvolvimento
-- **Git** - Controle de versão
-- **GitHub** - Hospedagem do código-fonte
-- **VS Code** - Editor de código recomendado
+Em outro terminal, a partir da raiz do repositório:
 
-## Pessoas Contribuidoras
+```bash
+cd frontend
+npm install
+npm start
+```
 
-- [mathsant-js](https://github.com/mathsant-js) - Scrum Master e Desenvolvedor
+O aplicativo inicia em `http://localhost:3000`. O frontend utiliza o proxy configurado para encaminhar requisições ao backend em `http://localhost:8000`.
 
-## Pessoas Desenvolvedoras do Projeto
+### Configuração opcional
 
-- **mathsant-js** - Concepção, desenvolvimento backend e frontend, testes e documentação
+Por padrão, o backend usa o banco `backend/sqlite.db`, token JWT válido por 30 minutos e uma chave de desenvolvimento. Para personalizar a autenticação, crie `backend/.env`:
+
+```dotenv
+SECRET_KEY=uma-chave-secreta-longa-e-aleatoria
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+```
+
+Para usar outro banco, defina `DATABASE_URL` no ambiente antes de iniciar o backend:
+
+```bash
+export DATABASE_URL='sqlite:///./sqlite.db'
+```
+
+## Primeiro acesso
+
+Ao iniciar o backend, o catálogo de equipamentos é preenchido automaticamente caso esteja vazio. Não há credenciais padrão: crie uma conta na tela de cadastro e, em seguida, cadastre uma residência para iniciar a estimativa de consumo.
+
+## Estrutura do projeto
+
+```text
+backend/
+  app/                 API FastAPI, modelos, schemas e regras de negócio
+  requirements.txt     Dependências Python
+frontend/
+  src/                 Aplicação React e TypeScript
+  package.json         Dependências e scripts npm
+docs/                  Documentação complementar
+```
+
+## Validação
+
+Para gerar o build de produção do frontend:
+
+```bash
+cd frontend
+npm run build
+```
+
+O projeto também inclui scripts de verificação manual no diretório `backend`, incluindo o teste de isolamento de dados entre usuários.
 
 ## Licença
 
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
+Este projeto está licenciado sob a Licença MIT. Consulte [LICENSE](LICENSE).
