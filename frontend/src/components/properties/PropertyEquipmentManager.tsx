@@ -49,6 +49,8 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
   const [editingEquipmentId, setEditingEquipmentId] = useState<number | null>(null);
   const [editQuantity, setEditQuantity] = useState('');
   const [editHoursPerDay, setEditHoursPerDay] = useState('');
+  const [removingEquipment, setRemovingEquipment] = useState<PropertyEquipmentWithDetails | null>(null);
+  const [isRemoving, setIsRemoving] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -153,6 +155,28 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
     }
   };
 
+  const confirmRemoval = async () => {
+    if (!removingEquipment) return;
+
+    setIsRemoving(true);
+    setError(null);
+    try {
+      await api.delete(`/properties/${propertyId}/equipments/${removingEquipment.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setLinkedEquipments((items) => items.filter((item) => item.id !== removingEquipment.id));
+      setRemovingEquipment(null);
+    } catch (requestError: any) {
+      setError(getRequestErrorMessage(requestError, 'Não foi possível remover o equipamento.'));
+    } finally {
+      setIsRemoving(false);
+    }
+  };
+
+  const getMonthlyConsumption = (item: PropertyEquipmentWithDetails) => (
+    (item.equipment.power_watts * item.quantity * item.hours_per_day * 30) / 1000
+  );
+
   return (
     <section className="equipment-manager" aria-labelledby="equipment-manager-title">
       <div className="properties-header">
@@ -208,14 +232,33 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
                     <div className="card-actions"><button type="button" className="secondary-button" onClick={cancelEditing} disabled={isSaving}>Cancelar</button><button type="submit" disabled={isSaving}>{isSaving ? 'Salvando...' : 'Salvar'}</button></div>
                   </form>
                 ) : <>
-                  <div><h2>{item.equipment.name}</h2><p>{item.equipment.category} · {item.quantity} unidade{item.quantity === 1 ? '' : 's'} · {item.hours_per_day} h/dia</p></div>
-                  <div className="equipment-card-actions"><strong>{item.equipment.power_watts} W</strong><button className="secondary-button" onClick={() => startEditing(item)}>Editar uso</button></div>
+                  <div>
+                    <h2>{item.equipment.name}</h2>
+                    <p>{item.equipment.category} · {item.quantity} unidade{item.quantity === 1 ? '' : 's'} · {item.hours_per_day} h/dia</p>
+                    <p className="equipment-consumption">{getMonthlyConsumption(item).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} kWh/mês estimados</p>
+                  </div>
+                  <div className="equipment-card-actions">
+                    <strong>{item.equipment.power_watts} W</strong>
+                    <div className="equipment-card-controls"><button className="secondary-button" onClick={() => startEditing(item)}>Editar uso</button><button className="danger-button" onClick={() => setRemovingEquipment(item)}>Remover</button></div>
+                  </div>
                 </>}
               </li>
             ))}
           </ul>
         )}
       </>}
+      {removingEquipment && (
+        <div className="modal-backdrop" role="presentation">
+          <div className="modal" role="dialog" aria-modal="true" aria-labelledby="remove-equipment-title">
+            <h3 id="remove-equipment-title">Remover equipamento?</h3>
+            <p>{removingEquipment.equipment.name} deixará de compor o consumo desta residência.</p>
+            <div className="form-actions">
+              <button className="secondary-button" onClick={() => setRemovingEquipment(null)} disabled={isRemoving}>Cancelar</button>
+              <button className="danger-button" onClick={confirmRemoval} disabled={isRemoving}>{isRemoving ? 'Removendo...' : 'Remover'}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
