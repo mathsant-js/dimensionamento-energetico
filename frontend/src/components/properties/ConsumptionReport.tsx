@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api.ts';
 import { ConsumptionReport } from '../../types/equipment.ts';
+import ConsumptionChart from './ConsumptionChart.tsx';
 import './ConsumptionReport.css';
 
 interface ConsumptionReportProps {
@@ -19,6 +20,7 @@ const ConsumptionReportComponent: React.FC<ConsumptionReportProps> = ({
   const [report, setReport] = useState<ConsumptionReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [chartType, setChartType] = useState<'pie' | 'bar'>('pie');
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -126,7 +128,31 @@ const ConsumptionReportComponent: React.FC<ConsumptionReportProps> = ({
           </div>
         </section>
 
-        {/* Equipment Comparison Section */}
+        {/* Consumption Chart Section */}
+        <section className="chart-section">
+          <div className="chart-header">
+            <h3>Participação Percentual do Consumo</h3>
+            <div className="chart-type-toggle">
+              <button
+                className={`toggle-button ${chartType === 'pie' ? 'active' : ''}`}
+                onClick={() => setChartType('pie')}
+              >
+                📊 Pizza
+              </button>
+              <button
+                className={`toggle-button ${chartType === 'bar' ? 'active' : ''}`}
+                onClick={() => setChartType('bar')}
+              >
+                📈 Barras
+              </button>
+            </div>
+          </div>
+          <ConsumptionChart
+            items={report.items}
+            total={report.total_monthly_consumption_kwh}
+            chartType={chartType}
+          />
+        </section>
         <section className="equipments-section">
           <h3>Comparação de Consumo por Equipamento</h3>
           <div className="table-wrapper">
