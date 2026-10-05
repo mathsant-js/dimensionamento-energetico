@@ -55,7 +55,7 @@ const ConsumptionReportComponent: React.FC<ConsumptionReportProps> = ({
       <div className="consumption-report-container">
         <div className="consumption-report-header">
           <h2>Carregando relatório...</h2>
-          <button className="close-button" onClick={onClose}>✕</button>
+          <button className="close-button" onClick={onClose} aria-label="Fechar relatório">✕</button>
         </div>
       </div>
     );
@@ -66,7 +66,7 @@ const ConsumptionReportComponent: React.FC<ConsumptionReportProps> = ({
       <div className="consumption-report-container">
         <div className="consumption-report-header">
           <h2>Relatório de Consumo</h2>
-          <button className="close-button" onClick={onClose}>✕</button>
+          <button className="close-button" onClick={onClose} aria-label="Fechar relatório">✕</button>
         </div>
         <div className="alert">{error}</div>
         <button className="secondary-button" onClick={onClose}>Voltar</button>
@@ -78,8 +78,8 @@ const ConsumptionReportComponent: React.FC<ConsumptionReportProps> = ({
     return (
       <div className="consumption-report-container">
         <div className="consumption-report-header">
-          <h2>Relatório de Consumo - {propertyName}</h2>
-          <button className="close-button" onClick={onClose}>✕</button>
+          <div><span className="report-kicker">Diagnóstico energético</span><h2>{propertyName}</h2></div>
+          <button className="close-button" onClick={onClose} aria-label="Fechar relatório">✕</button>
         </div>
         <div className="empty-state">
           <p>Nenhum equipamento cadastrado para esta propriedade ainda.</p>
@@ -111,14 +111,33 @@ const ConsumptionReportComponent: React.FC<ConsumptionReportProps> = ({
     <div className="consumption-report-container">
       <div className="consumption-report-header">
         <div>
-          <h2>Relatório de Consumo - {propertyName}</h2>
-          <p className="report-subtitle">{report.property_type}</p>
+          <span className="report-kicker">Diagnóstico energético</span>
+          <h2>{propertyName}</h2>
+          <p className="report-subtitle">Relatório mensal para {report.property_type}</p>
         </div>
-        <button className="close-button" onClick={onClose}>✕</button>
+        <button className="close-button" onClick={onClose} aria-label="Fechar relatório">✕</button>
       </div>
 
       <div className="report-content">
-        {/* Highest Consumer Alert */}
+        <section className="summary-section">
+          <div className="summary-card">
+            <div className="summary-item total">
+              <span className="summary-label">Consumo total mensal</span>
+              <span className="summary-value total-value">
+                {formatMonthlyConsumption(report.total_monthly_consumption_kwh)}
+              </span>
+            </div>
+            <div className="summary-item">
+              <span className="summary-label">Equipamentos cadastrados</span>
+              <span className="summary-value">{report.items.length}</span>
+            </div>
+            <div className="summary-item">
+              <span className="summary-label">Maior impacto</span>
+              <span className="summary-value summary-equipment">{highestConsumer.equipment_name}</span>
+            </div>
+          </div>
+        </section>
+
         <section className="highest-consumer-section">
           <div className="highest-consumer-card">
             <div className="highest-consumer-icon">⚡</div>
@@ -135,7 +154,6 @@ const ConsumptionReportComponent: React.FC<ConsumptionReportProps> = ({
           </div>
         </section>
 
-        {/* Consumption Chart Section */}
         <section className="chart-section">
           <div className="chart-header">
             <h3>Participação Percentual do Consumo</h3>
@@ -204,26 +222,6 @@ const ConsumptionReportComponent: React.FC<ConsumptionReportProps> = ({
                 ))}
               </tbody>
             </table>
-          </div>
-        </section>
-
-        {/* Summary Section */}
-        <section className="summary-section">
-          <div className="summary-card">
-            <div className="summary-item">
-              <span className="summary-label">Total de Equipamentos</span>
-              <span className="summary-value">{report.items.length}</span>
-            </div>
-            <div className="summary-item">
-              <span className="summary-label">Equipamento com Maior Consumo</span>
-              <span className="summary-value summary-equipment">{highestConsumer.equipment_name}</span>
-            </div>
-            <div className="summary-item total">
-              <span className="summary-label">Consumo Total Mensal</span>
-              <span className="summary-value total-value">
-                {formatMonthlyConsumption(report.total_monthly_consumption_kwh)}
-              </span>
-            </div>
           </div>
         </section>
 

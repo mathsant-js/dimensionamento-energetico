@@ -1,444 +1,58 @@
-.consumption-report-container {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
-  padding: 32px;
-  margin: 24px 0;
-  max-width: 1000px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.consumption-report-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 32px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.consumption-report-header h2 {
-  margin: 0 0 8px 0;
-  font-size: 24px;
-  font-weight: 600;
-  color: #1a1a1a;
-}
-
-.report-subtitle {
-  margin: 0;
-  font-size: 14px;
-  color: #666;
-  text-transform: capitalize;
-}
-
-.close-button {
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: #999;
-  cursor: pointer;
-  padding: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.close-button:hover {
-  background: #f0f0f0;
-  color: #333;
-}
-
-.report-content {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
-
-/* Highest Consumer Section */
-.highest-consumer-section {
-  margin-bottom: 16px;
-}
-
-.highest-consumer-card {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 20px;
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-  border: 2px solid #dc2626;
-  border-radius: 8px;
-}
-
-.highest-consumer-icon {
-  font-size: 40px;
-  line-height: 1;
-  min-width: 50px;
-  text-align: center;
-}
-
-.highest-consumer-content h3 {
-  margin: 0 0 8px 0;
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #7f1d1d;
-}
-
-.highest-consumer-name {
-  margin: 0 0 8px 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: #dc2626;
-}
-
-.highest-consumer-value {
-  margin: 0;
-  font-size: 14px;
-  color: #b91c1c;
-}
-
-.highest-consumer-percentage {
-  display: block;
-  font-size: 12px;
-  color: #991b1b;
-  margin-top: 4px;
-}
-
-/* Chart Section */
-.chart-section {
-  padding: 24px;
-  background: #f9f9f9;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-}
-
-.chart-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  gap: 20px;
-}
-
-.chart-header h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
-}
-
-.chart-type-toggle {
-  display: flex;
-  gap: 8px;
-}
-
-.toggle-button {
-  padding: 8px 16px;
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: #666;
-}
-
-.toggle-button:hover {
-  background: #f0f0f0;
-  border-color: #999;
-}
-
-.toggle-button.active {
-  background: #2563eb;
-  border-color: #2563eb;
-  color: white;
-  font-weight: 600;
-}
-
-.equipments-section h3 {
-  margin: 0 0 16px 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
-}
-
-.equipments-table-container {
-  overflow-x: auto;
-  border-radius: 6px;
-  border: 1px solid #e0e0e0;
-}
-
-.equipments-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-
-.equipments-table thead {
-  background: #f9f9f9;
-  border-bottom: 2px solid #e0e0e0;
-}
-
-.equipments-table th {
-  padding: 12px 16px;
-  text-align: left;
-  font-weight: 600;
-  color: #333;
-  white-space: nowrap;
-}
-
-.equipments-table tbody tr {
-  border-bottom: 1px solid #e0e0e0;
-  transition: background 0.2s ease;
-}
-
-.equipments-table tbody tr:hover {
-  background: #f9f9f9;
-}
-
-.equipments-table tbody tr.highest-row {
-  background: #fef2f2;
-  font-weight: 600;
-}
-
-.equipments-table tbody tr.highest-row:hover {
-  background: #fee2e2;
-}
-
-.equipments-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-.equipments-table td {
-  padding: 12px 16px;
-  color: #333;
-}
-
-.equipments-table td.numeric {
-  text-align: right;
-  font-family: 'Courier New', monospace;
-}
-
-.equipments-table td.consumption {
-  font-weight: 600;
-  color: #2563eb;
-}
-
-.equipments-table td.consumption small {
-  display: block;
-  margin-top: 5px;
-  color: #64748b;
-  font-family: 'Courier New', monospace;
-  font-size: 11px;
-  font-weight: 400;
-  white-space: nowrap;
-}
-
-.equipment-name {
-  font-weight: 500;
-  color: #1a1a1a;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.highest-badge {
-  color: #dc2626;
-  font-size: 16px;
-}
-
-/* Percentage Column */
-.percentage-bar-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 150px;
-}
-
-.percentage-bar {
-  flex: 1;
-  height: 20px;
-  border-radius: 4px;
-  background: #3b82f6;
-  min-width: 20px;
-  transition: background 0.2s ease;
-}
-
-.percentage-text {
-  font-size: 12px;
-  font-weight: 600;
-  color: #333;
-  min-width: 35px;
-  text-align: right;
-}
-
-/* Summary Section */
-.summary-section {
-  background: #f0f8ff;
-  border: 1px solid #dbeafe;
-  border-radius: 8px;
-  padding: 24px;
-}
-
-.summary-card {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 24px;
-}
-
-.summary-item {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.summary-item.total {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  color: white;
-  padding: 16px;
-  border-radius: 6px;
-}
-
-.summary-label {
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #666;
-}
-
-.summary-item.total .summary-label {
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.summary-value {
-  font-size: 28px;
-  font-weight: 700;
-  color: #2563eb;
-}
-
-.summary-item.total .summary-value {
-  color: white;
-}
-
-.summary-equipment {
-  color: #1a1a1a;
-  font-size: 16px;
-}
-
-.total-value {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 48px 24px;
-  background: #f9f9f9;
-  border-radius: 8px;
-}
-
-.empty-state p {
-  margin: 0 0 8px 0;
-  font-size: 16px;
-  color: #666;
-}
-
-.empty-state .subtitle {
-  margin: 8px 0 0 0;
-  font-size: 14px;
-  color: #999;
-}
-
-.empty-state button {
-  margin-top: 16px;
-}
-
-.alert {
-  padding: 16px;
-  background: #fee;
-  border: 1px solid #fcc;
-  border-radius: 6px;
-  color: #c00;
-  margin-bottom: 16px;
-}
-
-.actions-section {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding-top: 16px;
-  border-top: 1px solid #e0e0e0;
-}
-
-@media (max-width: 768px) {
-  .consumption-report-container {
-    padding: 20px;
-  }
-
-  .consumption-report-header {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .close-button {
-    align-self: flex-end;
-  }
-
-  .summary-card {
-    grid-template-columns: 1fr;
-  }
-
-  .equipments-table {
-    font-size: 12px;
-  }
-
-  .equipments-table th,
-  .equipments-table td {
-    padding: 8px 12px;
-  }
-
-  .summary-value {
-    font-size: 20px;
-  }
-
-  .highest-consumer-card {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .equipment-name {
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .percentage-bar-container {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .percentage-text {
-    text-align: left;
-  }
-
-  .chart-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .chart-type-toggle {
-    width: 100%;
-  }
-
-  .toggle-button {
-    flex: 1;
-  }
+.consumption-report-container { max-width: 1060px; margin: 0 auto; }
+.consumption-report-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
+.report-kicker { color: #67e8f9; font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.consumption-report-header h2 { margin: 8px 0 6px; color: #ecfeff; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -.05em; }
+.report-subtitle { margin: 0; color: #93aabb; text-transform: capitalize; }
+.close-button { display: grid; width: 38px; height: 38px; place-items: center; flex: 0 0 auto; padding: 0; background: transparent; border-color: #31505e; color: #b8cad7; font-size: 1.25rem; }
+.close-button:hover { background: #152b38; color: #ecfeff; }
+.report-content { display: grid; gap: 20px; }
+.summary-section, .chart-section, .equipments-section, .highest-consumer-card { border: 1px solid rgba(103, 232, 249, .16); border-radius: 18px; background: rgba(16, 31, 43, .82); box-shadow: 0 22px 70px rgba(0, 0, 0, .2); }
+.summary-section { padding: 8px; }
+.summary-card { display: grid; grid-template-columns: 1.3fr 1fr 1.2fr; gap: 8px; }
+.summary-item { display: grid; align-content: center; gap: 8px; min-height: 112px; padding: 18px 20px; border-radius: 13px; }
+.summary-item.total { background: linear-gradient(135deg, #0e7490, #155e75); box-shadow: inset 0 1px rgba(236, 254, 255, .16); }
+.summary-label { color: #8eabba; font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.summary-item.total .summary-label { color: #cffafe; }
+.summary-value { color: #67e8f9; font-size: clamp(1.35rem, 3vw, 2rem); font-weight: 750; letter-spacing: -.04em; }
+.summary-item.total .summary-value { color: #ecfeff; }
+.summary-equipment { color: #d8f4f7; font-size: 1.05rem; line-height: 1.3; }
+.highest-consumer-card { display: flex; align-items: center; gap: 18px; padding: 20px 24px; border-color: rgba(251, 191, 36, .35); background: linear-gradient(110deg, rgba(120, 53, 15, .35), rgba(16, 31, 43, .9) 62%); }
+.highest-consumer-icon { display: grid; width: 48px; height: 48px; place-items: center; flex: 0 0 auto; border-radius: 14px; background: rgba(251, 191, 36, .14); color: #fbbf24; font-size: 1.5rem; }
+.highest-consumer-content h3 { margin: 0 0 5px; color: #fcd34d; font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; }
+.highest-consumer-name { margin: 0; color: #f8fafc; font-size: 1.2rem; font-weight: 700; }
+.highest-consumer-value { margin: 5px 0 0; color: #d9e8ed; font-weight: 600; }
+.highest-consumer-percentage { margin-left: 8px; color: #fcd34d; font-size: .84rem; font-weight: 600; }
+.chart-section, .equipments-section { padding: 24px; }
+.chart-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.chart-header h3, .equipments-section h3 { margin: 0; color: #ecfeff; font-size: 1.12rem; letter-spacing: -.02em; }
+.chart-type-toggle { display: flex; gap: 7px; padding: 4px; border: 1px solid #284553; border-radius: 11px; background: #0a1822; }
+.toggle-button { padding: 7px 11px; border: 0; border-radius: 7px; background: transparent; color: #90aabb; font-size: .78rem; }
+.toggle-button:hover { background: #152b38; color: #ecfeff; }
+.toggle-button.active { background: #164e63; color: #a5f3fc; }
+.table-wrapper { overflow-x: auto; margin-top: 17px; border: 1px solid #284553; border-radius: 12px; }
+.equipments-table { width: 100%; min-width: 780px; border-collapse: collapse; font-size: .84rem; }
+.equipments-table thead { background: #0a1822; }
+.equipments-table th { padding: 13px 15px; color: #91aab8; font-size: .7rem; letter-spacing: .08em; text-align: left; text-transform: uppercase; white-space: nowrap; }
+.equipments-table td { padding: 15px; border-top: 1px solid rgba(49, 80, 94, .65); color: #c9d9e2; }
+.equipments-table tbody tr { transition: background .18s; }
+.equipments-table tbody tr:hover { background: rgba(28, 69, 83, .35); }
+.equipments-table tbody tr.highest-row { background: rgba(120, 53, 15, .2); }
+.equipments-table tbody tr.highest-row:hover { background: rgba(120, 53, 15, .32); }
+.equipments-table td.numeric { text-align: right; font-variant-numeric: tabular-nums; }
+.equipments-table td.consumption { color: #67e8f9; font-weight: 700; }
+.equipments-table td.consumption small { display: block; margin-top: 5px; color: #7994a3; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .67rem; font-weight: 400; white-space: nowrap; }
+.equipment-name { display: flex; align-items: center; gap: 8px; color: #ecfeff; font-weight: 650; }
+.highest-badge { color: #fbbf24; }
+.percentage-bar-container { display: grid; grid-template-columns: minmax(46px, 1fr) 40px; align-items: center; gap: 8px; min-width: 130px; }
+.percentage-bar { height: 7px; min-width: 4px; border-radius: 999px; box-shadow: 0 0 12px rgba(34, 211, 238, .25); }
+.percentage-text { color: #bcd0da; font-size: .75rem; font-weight: 700; text-align: right; }
+.actions-section { display: flex; justify-content: flex-end; gap: 10px; padding-top: 4px; }
+.consumption-report-container .empty-state { padding: 48px 24px; border: 1px dashed #31505e; border-radius: 18px; text-align: center; }
+.consumption-report-container .empty-state p { margin: 0; color: #d8e7ee; }
+.consumption-report-container .empty-state .subtitle { margin-top: 7px; color: #91aab8; }
+.consumption-report-container .empty-state button { margin-top: 18px; }
+.consumption-report-container .alert { margin-bottom: 16px; }
+
+@media (max-width: 760px) {
+  .consumption-report-header { margin-bottom: 24px; }.summary-card { grid-template-columns: 1fr; gap: 3px; }.summary-item { min-height: 82px; }.highest-consumer-card { align-items: flex-start; padding: 18px; }.chart-section, .equipments-section { padding: 17px; }.chart-header { align-items: flex-start; flex-direction: column; }.chart-type-toggle { width: 100%; }.toggle-button { flex: 1; }.actions-section { justify-content: stretch; }.actions-section button { flex: 1; }
 }
