@@ -24,6 +24,8 @@ h2 { margin: 0; font-size: 1.35rem; letter-spacing: -.025em; }
 label { color: #b8cad7; font-size: .84rem; font-weight: 600; }
 input { box-sizing: border-box; width: 100%; background: #0a1822; color: #ecfeff; border: 1px solid #284553; border-radius: 9px; padding: 12px 13px; font: inherit; outline: none; transition: border-color .18s, box-shadow .18s; }
 input:focus { border-color: #22d3ee; box-shadow: 0 0 0 3px rgba(34, 211, 238, .14); }
+select { box-sizing: border-box; width: 100%; appearance: none; background: #0a1822; color: #ecfeff; border: 1px solid #284553; border-radius: 9px; padding: 12px 13px; font: inherit; outline: none; }
+select:focus { border-color: #22d3ee; box-shadow: 0 0 0 3px rgba(34, 211, 238, .14); }
 button { cursor: pointer; border: 1px solid transparent; border-radius: 9px; padding: 10px 15px; background: #22d3ee; color: #04242d; font: inherit; font-weight: 700; transition: transform .18s, background .18s; }
 button:hover:not(:disabled) { background: #a5f3fc; transform: translateY(-1px); }
 button:disabled { cursor: wait; opacity: .65; }
@@ -41,8 +43,18 @@ button:disabled { cursor: wait; opacity: .65; }
 .card-actions { display: flex; gap: 8px; flex-shrink: 0; }
 .card-actions button { padding: 8px 11px; font-size: .82rem; }
 .empty-state { border: 1px dashed #31505e; border-radius: 16px; color: #9cb1c3; padding: 44px 22px; text-align: center; }
+.catalog-section { max-width: 900px; margin: 0 auto; }
+.catalog-header { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 28px; }
+.catalog-header h1 { font-size: clamp(2.1rem, 5vw, 3.6rem); max-width: 620px; }
+.catalog-header .subtitle { margin-bottom: 0; }
+.catalog-filters { display: grid; grid-template-columns: minmax(0, 2fr) minmax(200px, 1fr); gap: 16px; margin-bottom: 24px; }
+.equipment-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; list-style: none; padding: 0; margin: 0; }
+.equipment-card { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 19px 20px; background: rgba(16, 31, 43, .82); border: 1px solid rgba(103, 232, 249, .17); border-radius: 14px; }
+.equipment-card h2 { margin: 0; }
+.equipment-card p { color: #92aab9; font-size: .88rem; margin: 5px 0 0; }
+.equipment-card strong { color: #67e8f9; white-space: nowrap; font-size: 1.12rem; }
 .alert { background: rgba(251, 113, 133, .12); border: 1px solid rgba(251, 113, 133, .35); border-radius: 9px; color: #fecdd3; padding: 10px 12px; font-size: .9rem; }
 .modal-backdrop { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 24px; background: rgba(2, 8, 12, .7); backdrop-filter: blur(4px); }
 .modal { max-width: 380px; background: #10202c; border: 1px solid #31505e; border-radius: 16px; padding: 26px; box-shadow: 0 24px 70px #000; }
 .modal h3 { margin-top: 0; }.modal p { color: #a9bfcc; line-height: 1.5; }
-@media (max-width: 650px) { .app-shell { padding: 22px 16px 50px; }.topbar, .dashboard-intro, .property-card-top { align-items: flex-start; flex-direction: column; }.topbar { padding-bottom: 30px; }.topbar-actions { width: 100%; }.topbar-actions button { flex: 1; }.form-grid { grid-template-columns: 1fr; }.auth-card { padding: 30px 24px; }.card-actions { width: 100%; }.card-actions button { flex: 1; } }
+@media (max-width: 650px) { .app-shell { padding: 22px 16px 50px; }.topbar, .dashboard-intro, .catalog-header, .property-card-top { align-items: flex-start; flex-direction: column; }.topbar { padding-bottom: 30px; }.topbar-actions { width: 100%; }.topbar-actions button { flex: 1; }.form-grid, .catalog-filters, .equipment-list { grid-template-columns: 1fr; }.auth-card { padding: 30px 24px; }.card-actions { width: 100%; }.card-actions button { flex: 1; } }

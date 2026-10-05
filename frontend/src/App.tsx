@@ -3,6 +3,7 @@ import api from './api.ts';
 import PropertyList from './components/properties/PropertyList.tsx';
 import PropertyCreateForm from './components/properties/PropertyCreateForm.tsx';
 import RegisterForm from './components/auth/RegisterForm.tsx';
+import EquipmentCatalog from './components/equipment/EquipmentCatalog.tsx';
 import { PropertyCreate } from './types/property.ts';
 import './App.css';
 
@@ -14,6 +15,7 @@ function App() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
   const [showCreatePropertyForm, setShowCreatePropertyForm] = useState(false);
+  const [activeView, setActiveView] = useState<'properties' | 'catalog'>('properties');
   const [propertiesVersion, setPropertiesVersion] = useState(0);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -136,26 +138,31 @@ function App() {
       <header className="topbar">
         <div className="brand"><span className="brand-mark">E</span>Energia Clara</div>
         <div className="topbar-actions">
+          <button className="secondary-button" onClick={() => setActiveView(activeView === 'properties' ? 'catalog' : 'properties')}>
+            {activeView === 'properties' ? 'Catálogo' : 'Residências'}
+          </button>
           <button className="secondary-button" onClick={handleLogout}>Sair</button>
-          <button onClick={() => setShowCreatePropertyForm(true)}>Nova residência</button>
+          {activeView === 'properties' && <button onClick={() => setShowCreatePropertyForm(true)}>Nova residência</button>}
         </div>
       </header>
-      <section className="dashboard-intro">
-        <div><span className="eyebrow">Painel de residências</span><h1>Onde a sua energia começa.</h1></div>
-        <p className="subtitle">Cadastre os espaços que farão parte da sua análise.</p>
-      </section>
-      {showCreatePropertyForm && (
-        <PropertyCreateForm
-          onCreate={handleCreateProperty}
-          onCancel={() => setShowCreatePropertyForm(false)}
-          isCreating={false}
+      {activeView === 'catalog' ? <EquipmentCatalog token={token} /> : <>
+        <section className="dashboard-intro">
+          <div><span className="eyebrow">Painel de residências</span><h1>Onde a sua energia começa.</h1></div>
+          <p className="subtitle">Cadastre os espaços que farão parte da sua análise.</p>
+        </section>
+        {showCreatePropertyForm && (
+          <PropertyCreateForm
+            onCreate={handleCreateProperty}
+            onCancel={() => setShowCreatePropertyForm(false)}
+            isCreating={false}
+          />
+        )}
+        <PropertyList 
+          token={token} 
+          refreshVersion={propertiesVersion}
+          onChanged={() => setPropertiesVersion((version) => version + 1)}
         />
-      )}
-      <PropertyList 
-        token={token} 
-        refreshVersion={propertiesVersion}
-        onChanged={() => setPropertiesVersion((version) => version + 1)}
-      />
+      </>}
     </div>
   );
 }
