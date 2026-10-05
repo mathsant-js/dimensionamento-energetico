@@ -231,6 +231,16 @@
   color: #2563eb;
 }
 
+.equipments-table td.consumption small {
+  display: block;
+  margin-top: 5px;
+  color: #64748b;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
 .equipment-name {
   font-weight: 500;
   color: #1a1a1a;

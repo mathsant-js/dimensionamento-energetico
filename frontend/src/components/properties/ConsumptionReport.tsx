@@ -11,6 +11,10 @@ interface ConsumptionReportProps {
   token: string;
 }
 
+const formatMonthlyConsumption = (value: number) => (
+  `${value.toLocaleString('pt-BR', { maximumFractionDigits: 2 })} kWh/mês`
+);
+
 const ConsumptionReportComponent: React.FC<ConsumptionReportProps> = ({
   propertyId,
   propertyName,
@@ -163,7 +167,7 @@ const ConsumptionReportComponent: React.FC<ConsumptionReportProps> = ({
                   <th>Potência (W)</th>
                   <th>Quantidade</th>
                   <th>Horas/dia</th>
-                  <th>Consumo Mensal (kWh)</th>
+                  <th>Consumo mensal</th>
                   <th>% do Total</th>
                 </tr>
               </thead>
@@ -178,7 +182,8 @@ const ConsumptionReportComponent: React.FC<ConsumptionReportProps> = ({
                     <td className="numeric">{item.quantity}</td>
                     <td className="numeric">{item.hours_per_day.toFixed(1)}</td>
                     <td className="numeric consumption">
-                      {item.monthly_consumption_kwh.toFixed(2)}
+                      <span>{formatMonthlyConsumption(item.monthly_consumption_kwh)}</span>
+                      <small>{item.power_watts} W × {item.quantity} × {item.hours_per_day} h/dia × 30 ÷ 1000</small>
                     </td>
                     <td className="numeric percentage">
                       <div className="percentage-bar-container">

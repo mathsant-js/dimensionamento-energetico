@@ -177,6 +177,10 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
     (item.equipment.power_watts * item.quantity * item.hours_per_day * 30) / 1000
   );
 
+  const formatMonthlyConsumption = (value: number) => (
+    `${value.toLocaleString('pt-BR', { maximumFractionDigits: 2 })} kWh/mês`
+  );
+
   return (
     <section className="equipment-manager" aria-labelledby="equipment-manager-title">
       <div className="properties-header">
@@ -235,7 +239,8 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
                   <div>
                     <h2>{item.equipment.name}</h2>
                     <p>{item.equipment.category} · {item.quantity} unidade{item.quantity === 1 ? '' : 's'} · {item.hours_per_day} h/dia</p>
-                    <p className="equipment-consumption">{getMonthlyConsumption(item).toLocaleString('pt-BR', { maximumFractionDigits: 2 })} kWh/mês estimados</p>
+                    <p className="equipment-formula">{item.equipment.power_watts} W × {item.quantity} × {item.hours_per_day} h/dia × 30 ÷ 1000</p>
+                    <p className="equipment-consumption">= {formatMonthlyConsumption(getMonthlyConsumption(item))} estimados</p>
                   </div>
                   <div className="equipment-card-actions">
                     <strong>{item.equipment.power_watts} W</strong>

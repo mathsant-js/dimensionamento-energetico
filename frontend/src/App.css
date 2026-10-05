@@ -52,6 +52,7 @@ button:disabled { cursor: wait; opacity: .65; }
 .equipment-card-actions button { padding: 7px 10px; font-size: .82rem; }
 .equipment-card-controls { display: flex; gap: 8px; }
 .equipment-consumption { color: #b8cad7 !important; font-weight: 600; }
+.equipment-formula { color: #7892a2 !important; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .76rem !important; margin-top: 10px !important; }
 .equipment-card-editing { grid-column: 1 / -1; align-items: stretch; }
 .equipment-edit-form { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(210px, 1fr); align-items: end; width: 100%; gap: 16px; }
 .equipment-edit-form .card-actions { grid-column: 1 / -1; width: auto; justify-content: flex-end; }
