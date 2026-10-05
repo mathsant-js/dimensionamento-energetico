@@ -10,6 +10,13 @@ interface PropertyEquipmentManagerProps {
 }
 
 const validateUsage = (quantity: string, hoursPerDay: string): string | null => {
+  if (!quantity.trim()) {
+    return 'Informe a quantidade de equipamentos.';
+  }
+  if (!hoursPerDay.trim()) {
+    return 'Informe as horas de uso por dia.';
+  }
+
   const parsedQuantity = Number(quantity);
   const parsedHours = Number(hoursPerDay);
 
@@ -209,7 +216,7 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
 
       {error && <p className="alert" role="alert">{error}</p>}
       {isLoading ? <div className="empty-state" role="status">Carregando equipamentos...</div> : <>
-        <form className="form-card equipment-link-form" onSubmit={handleSubmit}>
+        <form className="form-card equipment-link-form" onSubmit={handleSubmit} noValidate>
           <h2>Adicionar equipamento</h2>
           <div className="form-grid">
             <div className="field full-width">
@@ -245,7 +252,7 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
             {linkedEquipments.map((item) => (
               <li className={`equipment-card ${editingEquipmentId === item.id ? 'equipment-card-editing' : ''}`} key={item.id}>
                 {editingEquipmentId === item.id ? (
-                  <form className="equipment-edit-form" onSubmit={(event) => handleUpdate(event, item)}>
+                  <form className="equipment-edit-form" onSubmit={(event) => handleUpdate(event, item)} noValidate>
                     <div><h2>{item.equipment.name}</h2><p>{item.equipment.category}</p></div>
                     <div className="equipment-edit-fields">
                       <label>Quantidade<input type="number" min="1" step="1" required value={editQuantity} onChange={(event) => setEditQuantity(event.target.value)} /></label>

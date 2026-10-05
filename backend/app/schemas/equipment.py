@@ -45,7 +45,7 @@ class EquipmentRead(EquipmentBase):
 # PropertyEquipment Schemas
 class PropertyEquipmentBase(BaseModel):
     equipment_id: int = Field(..., gt=0)
-    quantity: int = Field(default=1, ge=1)
+    quantity: int = Field(..., ge=1)
     hours_per_day: float = Field(..., ge=0, le=24)
 
     @field_validator("hours_per_day")
@@ -63,20 +63,20 @@ class PropertyEquipmentCreate(PropertyEquipmentBase):
 
 
 class PropertyEquipmentUpdate(BaseModel):
-    quantity: Optional[int] = Field(None, ge=1)
-    hours_per_day: Optional[float] = Field(None, ge=0, le=24)
+    quantity: int = Field(..., ge=1)
+    hours_per_day: float = Field(..., ge=0, le=24)
 
     @field_validator("quantity")
     @classmethod
     def validate_quantity(cls, value):
-        if value is not None and value <= 0:
+        if value <= 0:
             raise ValueError("Quantity must be greater than zero")
         return value
 
     @field_validator("hours_per_day")
     @classmethod
     def validate_hours_per_day(cls, value):
-        if value is not None and (value < 0 or value > 24):
+        if value < 0 or value > 24:
             raise ValueError("Daily usage time must be between 0 and 24 hours")
         return value
 
