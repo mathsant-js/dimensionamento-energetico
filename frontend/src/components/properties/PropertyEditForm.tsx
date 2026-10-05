@@ -30,17 +30,83 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
+  const validatePropertyForm = () => {
+    const nextErrors: Record<string, string> = {};
+
+    const identification = formData.identification?.trim();
+    const propertyType = formData.property_type?.trim();
+
+    if (!identification) {
+      nextErrors.identification = 'A identificação do imóvel é obrigatória.';
+    } else if (identification.length < 2) {
+      nextErrors.identification = 'A identificação deve ter pelo menos 2 caracteres.';
+    }
+
+    if (!propertyType) {
+      nextErrors.property_type = 'O tipo do imóvel é obrigatório.';
+    } else if (propertyType.length < 2) {
+      nextErrors.property_type = 'O tipo do imóvel deve ter pelo menos 2 caracteres.';
+    }
+
+    const numericFields: Array<[string, string, 'positive' | 'nonNegative' | 'latitude' | 'longitude' | 'tiltAngle']> = [
+      ['latitude', formData.latitude || '', 'latitude'],
+      ['longitude', formData.longitude || '', 'longitude'],
+      ['built_area', formData.built_area || '', 'positive'],
+      ['roof_area', formData.roof_area || '', 'nonNegative'],
+      ['tilt_angle', formData.tilt_angle || '', 'tiltAngle'],
+    ];
+
+    numericFields.forEach(([field, value, mode]) => {
+      if (!value) return;
+
+      const parsed = Number(value);
+      if (Number.isNaN(parsed)) {
+        nextErrors[field] = 'Informe um valor numérico válido.';
+        return;
+      }
+
+      if (mode === 'positive' && parsed <= 0) {
+        nextErrors[field] = 'A área construída deve ser maior que zero.';
+      }
+
+      if (mode === 'nonNegative' && parsed < 0) {
+        nextErrors[field] = 'A área do telhado não pode ser negativa.';
+      }
+
+      if (mode === 'latitude' && (parsed < -90 || parsed > 90)) {
+        nextErrors[field] = 'A latitude deve estar entre -90 e 90.';
+      }
+
+      if (mode === 'longitude' && (parsed < -180 || parsed > 180)) {
+        nextErrors[field] = 'A longitude deve estar entre -180 e 180.';
+      }
+
+      if (mode === 'tiltAngle' && (parsed < 0 || parsed > 90)) {
+        nextErrors[field] = 'O ângulo de inclinação deve estar entre 0° e 90°.';
+      }
+    });
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-    [name]: value,
+      [name]: value,
+    }));
+    setErrors(prev => ({
+      ...prev,
+      [name]: '',
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrors({});
+    if (!validatePropertyForm()) {
+      return;
+    }
     setLoading(true);
 
     try {
@@ -153,6 +219,8 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
           <input
             type="number"
             step="any"
+            min={-90}
+            max={90}
             name="latitude"
             value={formData.latitude || ''}
             onChange={handleChange}
@@ -164,6 +232,8 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
           <input
             type="number"
             step="any"
+            min={-180}
+            max={180}
             name="longitude"
             value={formData.longitude || ''}
             onChange={handleChange}
@@ -175,6 +245,7 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
           <input
             type="number"
             step="any"
+            min={0}
             name="built_area"
             value={formData.built_area || ''}
             onChange={handleChange}
@@ -186,6 +257,7 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
           <input
             type="number"
             step="any"
+            min={0}
             name="roof_area"
             value={formData.roof_area || ''}
             onChange={handleChange}
@@ -207,6 +279,8 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
           <input
             type="number"
             step="any"
+            min={0}
+            max={90}
             name="tilt_angle"
             value={formData.tilt_angle || ''}
             onChange={handleChange}

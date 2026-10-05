@@ -1,6 +1,16 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List
 from datetime import datetime
+
+
+def _clean_string(value: Optional[str]) -> Optional[str]:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        value = value.strip()
+        return value or None
+    return value
+
 
 # Equipment Schemas
 class EquipmentBase(BaseModel):
@@ -8,8 +18,21 @@ class EquipmentBase(BaseModel):
     category: str = Field(..., min_length=1, max_length=100)
     power_watts: float = Field(..., gt=0)
 
+    @field_validator("name", "category", mode="before")
+    @classmethod
+    def validate_required_text_fields(cls, value):
+        if value is None:
+            raise ValueError("This field is required")
+        if isinstance(value, str):
+            value = value.strip()
+            if not value:
+                raise ValueError("This field is required")
+        return value
+
+
 class EquipmentCreate(EquipmentBase):
     pass
+
 
 class EquipmentRead(EquipmentBase):
     id: int
@@ -18,18 +41,45 @@ class EquipmentRead(EquipmentBase):
     class Config:
         from_attributes = True
 
+
 # PropertyEquipment Schemas
 class PropertyEquipmentBase(BaseModel):
-    equipment_id: int
+    equipment_id: int = Field(..., gt=0)
     quantity: int = Field(default=1, ge=1)
     hours_per_day: float = Field(..., ge=0, le=24)
+
+    @field_validator("hours_per_day")
+    @classmethod
+    def validate_hours_per_day(cls, value):
+        if value is None:
+            raise ValueError("This field is required")
+        if value < 0 or value > 24:
+            raise ValueError("Daily usage time must be between 0 and 24 hours")
+        return value
+
 
 class PropertyEquipmentCreate(PropertyEquipmentBase):
     pass
 
+
 class PropertyEquipmentUpdate(BaseModel):
     quantity: Optional[int] = Field(None, ge=1)
     hours_per_day: Optional[float] = Field(None, ge=0, le=24)
+
+    @field_validator("quantity")
+    @classmethod
+    def validate_quantity(cls, value):
+        if value is not None and value <= 0:
+            raise ValueError("Quantity must be greater than zero")
+        return value
+
+    @field_validator("hours_per_day")
+    @classmethod
+    def validate_hours_per_day(cls, value):
+        if value is not None and (value < 0 or value > 24):
+            raise ValueError("Daily usage time must be between 0 and 24 hours")
+        return value
+
 
 class PropertyEquipmentRead(PropertyEquipmentBase):
     id: int
@@ -39,9 +89,11 @@ class PropertyEquipmentRead(PropertyEquipmentBase):
     class Config:
         from_attributes = True
 
+
 # Extended PropertyEquipment with Equipment details
 class PropertyEquipmentWithDetailsRead(PropertyEquipmentRead):
     equipment: EquipmentRead
+
 
 # Consumption Report Item
 class ConsumptionReportItem(BaseModel):
@@ -51,6 +103,7 @@ class ConsumptionReportItem(BaseModel):
     quantity: int
     hours_per_day: float
     monthly_consumption_kwh: float  # Calculated: (power_watts * quantity * hours_per_day * 30) / 1000
+
 
 class ConsumptionReport(BaseModel):
     property_id: int

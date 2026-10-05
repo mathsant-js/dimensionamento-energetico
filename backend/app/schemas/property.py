@@ -1,6 +1,16 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 from datetime import datetime
+
+
+def _clean_optional_string(value: Optional[str]) -> Optional[str]:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        value = value.strip()
+        return value or None
+    return value
+
 
 class PropertyBase(BaseModel):
     identification: str = Field(..., min_length=2, max_length=200)  # Nome/Identificação do imóvel
@@ -16,8 +26,26 @@ class PropertyBase(BaseModel):
     orientation: Optional[str] = Field(None, max_length=20)
     tilt_angle: Optional[float] = Field(None, ge=0, le=90)
 
+    @field_validator("identification", "property_type", mode="before")
+    @classmethod
+    def validate_required_text_fields(cls, value):
+        if value is None:
+            raise ValueError("This field is required")
+        if isinstance(value, str):
+            value = value.strip()
+            if not value:
+                raise ValueError("This field is required")
+        return value
+
+    @field_validator("address", "city", "state", "orientation", "zipcode", mode="before")
+    @classmethod
+    def normalize_optional_strings(cls, value):
+        return _clean_optional_string(value)
+
+
 class PropertyCreate(PropertyBase):
     pass
+
 
 class PropertyUpdate(BaseModel):
     identification: Optional[str] = Field(None, min_length=2, max_length=200)  # Nome/Identificação do imóvel
@@ -32,6 +60,23 @@ class PropertyUpdate(BaseModel):
     roof_area: Optional[float] = Field(None, ge=0)
     orientation: Optional[str] = Field(None, max_length=20)
     tilt_angle: Optional[float] = Field(None, ge=0, le=90)
+
+    @field_validator("identification", "property_type", mode="before")
+    @classmethod
+    def validate_optional_required_text_fields(cls, value):
+        if value is None:
+            return None
+        if isinstance(value, str):
+            value = value.strip()
+            if not value:
+                raise ValueError("This field is required")
+        return value
+
+    @field_validator("address", "city", "state", "orientation", "zipcode", mode="before")
+    @classmethod
+    def normalize_optional_strings(cls, value):
+        return _clean_optional_string(value)
+
 
 class PropertyRead(PropertyBase):
     id: int
