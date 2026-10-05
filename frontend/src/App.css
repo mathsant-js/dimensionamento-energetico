@@ -53,6 +53,8 @@ button:disabled { cursor: wait; opacity: .65; }
 .equipment-card-controls { display: flex; gap: 8px; }
 .equipment-consumption { color: #b8cad7 !important; font-weight: 600; }
 .equipment-formula { color: #7892a2 !important; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .76rem !important; margin-top: 10px !important; }
+.equipment-summary { display: grid; justify-items: end; gap: 5px; }
+.equipment-summary strong { color: #67e8f9; font-size: .95rem; }
 .equipment-card-editing { grid-column: 1 / -1; align-items: stretch; }
 .equipment-edit-form { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(210px, 1fr); align-items: end; width: 100%; gap: 16px; }
 .equipment-edit-form .card-actions { grid-column: 1 / -1; width: auto; justify-content: flex-end; }
@@ -71,4 +73,4 @@ button:disabled { cursor: wait; opacity: .65; }
 .modal-backdrop { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 24px; background: rgba(2, 8, 12, .7); backdrop-filter: blur(4px); }
 .modal { max-width: 380px; background: #10202c; border: 1px solid #31505e; border-radius: 16px; padding: 26px; box-shadow: 0 24px 70px #000; }
 .modal h3 { margin-top: 0; }.modal p { color: #a9bfcc; line-height: 1.5; }
-@media (max-width: 650px) { .app-shell { padding: 22px 16px 50px; }.topbar, .dashboard-intro, .catalog-header, .property-card-top { align-items: flex-start; flex-direction: column; }.topbar { padding-bottom: 30px; }.topbar-actions { width: 100%; }.topbar-actions button { flex: 1; }.form-grid, .catalog-filters, .equipment-list, .equipment-edit-form { grid-template-columns: 1fr; }.auth-card { padding: 30px 24px; }.card-actions { width: 100%; }.card-actions button { flex: 1; }.equipment-card-actions { justify-items: start; }.equipment-card-controls { width: 100%; }.equipment-card-controls button { flex: 1; } }
+@media (max-width: 650px) { .app-shell { padding: 22px 16px 50px; }.topbar, .dashboard-intro, .catalog-header, .property-card-top { align-items: flex-start; flex-direction: column; }.topbar { padding-bottom: 30px; }.topbar-actions { width: 100%; }.topbar-actions button { flex: 1; }.form-grid, .catalog-filters, .equipment-list, .equipment-edit-form { grid-template-columns: 1fr; }.auth-card { padding: 30px 24px; }.card-actions { width: 100%; }.card-actions button { flex: 1; }.equipment-card-actions, .equipment-summary { justify-items: start; }.equipment-card-controls { width: 100%; }.equipment-card-controls button { flex: 1; } }

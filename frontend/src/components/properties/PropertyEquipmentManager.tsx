@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../api.ts';
-import { Equipment, PropertyEquipment, PropertyEquipmentWithDetails } from '../../types/equipment.ts';
+import { ConsumptionReport, Equipment, PropertyEquipment, PropertyEquipmentWithDetails } from '../../types/equipment.ts';
 
 interface PropertyEquipmentManagerProps {
   propertyId: number;
@@ -40,6 +40,7 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
 }) => {
   const [catalog, setCatalog] = useState<Equipment[]>([]);
   const [linkedEquipments, setLinkedEquipments] = useState<PropertyEquipmentWithDetails[]>([]);
+  const [totalMonthlyConsumption, setTotalMonthlyConsumption] = useState(0);
   const [equipmentId, setEquipmentId] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [hoursPerDay, setHoursPerDay] = useState('1');
@@ -52,18 +53,29 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
   const [removingEquipment, setRemovingEquipment] = useState<PropertyEquipmentWithDetails | null>(null);
   const [isRemoving, setIsRemoving] = useState(false);
 
+  const getHeaders = () => ({ Authorization: `Bearer ${token}` });
+
+  const refreshTotalMonthlyConsumption = async () => {
+    const response = await api.get<ConsumptionReport>(`/properties/${propertyId}/consumption-report`, {
+      headers: getHeaders(),
+    });
+    setTotalMonthlyConsumption(response.data.total_monthly_consumption_kwh);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
       try {
         const headers = { Authorization: `Bearer ${token}` };
-        const [catalogResponse, linkedResponse] = await Promise.all([
+        const [catalogResponse, linkedResponse, reportResponse] = await Promise.all([
           api.get<Equipment[]>('/equipments/', { headers }),
           api.get<PropertyEquipmentWithDetails[]>(`/properties/${propertyId}/equipments/`, { headers }),
+          api.get<ConsumptionReport>(`/properties/${propertyId}/consumption-report`, { headers }),
         ]);
         setCatalog(catalogResponse.data);
         setLinkedEquipments(linkedResponse.data);
+        setTotalMonthlyConsumption(reportResponse.data.total_monthly_consumption_kwh);
       } catch {
         setError('Não foi possível carregar os equipamentos da residência.');
       } finally {
@@ -105,6 +117,7 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
       if (equipment) {
         setLinkedEquipments((items) => [...items, { ...response.data, equipment }]);
       }
+      await refreshTotalMonthlyConsumption();
       setEquipmentId('');
       setQuantity('1');
       setHoursPerDay('1');
@@ -147,6 +160,7 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
       setLinkedEquipments((items) => items.map((linkedItem) => (
         linkedItem.id === item.id ? { ...linkedItem, ...response.data } : linkedItem
       )));
+      await refreshTotalMonthlyConsumption();
       cancelEditing();
     } catch (requestError: any) {
       setError(getRequestErrorMessage(requestError, 'Não foi possível atualizar o equipamento.'));
@@ -165,6 +179,7 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
         headers: { Authorization: `Bearer ${token}` },
       });
       setLinkedEquipments((items) => items.filter((item) => item.id !== removingEquipment.id));
+      await refreshTotalMonthlyConsumption();
       setRemovingEquipment(null);
     } catch (requestError: any) {
       setError(getRequestErrorMessage(requestError, 'Não foi possível remover o equipamento.'));
@@ -219,7 +234,10 @@ const PropertyEquipmentManager: React.FC<PropertyEquipmentManagerProps> = ({
           <div className="form-actions"><button type="submit" disabled={isSaving || availableEquipments.length === 0}>{isSaving ? 'Adicionando...' : 'Adicionar equipamento'}</button></div>
         </form>
 
-        <div className="properties-header"><h2>Equipamentos vinculados</h2><span className="eyebrow">{linkedEquipments.length} item{linkedEquipments.length === 1 ? '' : 's'}</span></div>
+        <div className="properties-header">
+          <h2>Equipamentos vinculados</h2>
+          <div className="equipment-summary"><span className="eyebrow">{linkedEquipments.length} item{linkedEquipments.length === 1 ? '' : 's'}</span><strong>{formatMonthlyConsumption(totalMonthlyConsumption)} no total</strong></div>
+        </div>
         {linkedEquipments.length === 0 ? (
           <div className="empty-state">Nenhum equipamento vinculado ainda.</div>
         ) : (
