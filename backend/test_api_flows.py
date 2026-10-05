@@ -78,3 +78,99 @@ class ApiFlowsTest(unittest.TestCase):
 
         self.assertEqual(self.client.delete(f"/properties/{property_id}", headers=owner_headers).status_code, 200)
         self.assertEqual(self.client.get("/properties/", headers=owner_headers).json(), [])
+
+    def test_equipment_catalog_and_property_equipment_lifecycle(self):
+        self.assertEqual(self.client.get("/equipments/").status_code, 401)
+
+        owner_headers = self.register_and_login("equipment-owner")
+        other_headers = self.register_and_login("equipment-other")
+        property_response = self.client.post("/properties/", json={
+            "identification": "Casa com equipamentos", "property_type": "house",
+        }, headers=owner_headers)
+        self.assertEqual(property_response.status_code, 200)
+        property_id = property_response.json()["id"]
+
+        equipment_response = self.client.post("/equipments/", json={
+            "name": "Equipamento de teste", "category": "Teste", "power_watts": 1000,
+        }, headers=owner_headers)
+        self.assertEqual(equipment_response.status_code, 200)
+        equipment_id = equipment_response.json()["id"]
+
+        catalog_response = self.client.get("/equipments/", headers=owner_headers)
+        self.assertEqual(catalog_response.status_code, 200)
+        self.assertTrue(any(item["id"] == equipment_id for item in catalog_response.json()))
+
+        link_response = self.client.post(
+            f"/properties/{property_id}/equipments/",
+            json={"equipment_id": equipment_id, "quantity": 2, "hours_per_day": 3},
+            headers=owner_headers,
+        )
+        self.assertEqual(link_response.status_code, 200)
+        property_equipment_id = link_response.json()["id"]
+
+        duplicate_response = self.client.post(
+            f"/properties/{property_id}/equipments/",
+            json={"equipment_id": equipment_id, "quantity": 1, "hours_per_day": 1},
+            headers=owner_headers,
+        )
+        self.assertEqual(duplicate_response.status_code, 409)
+        self.assertEqual(duplicate_response.json()["detail"], "Equipment is already linked to this property")
+
+        invalid_usage_response = self.client.post(
+            f"/properties/{property_id}/equipments/",
+            json={"equipment_id": equipment_id, "quantity": 0, "hours_per_day": 25},
+            headers=owner_headers,
+        )
+        self.assertEqual(invalid_usage_response.status_code, 422)
+
+        self.assertEqual(
+            self.client.get(f"/properties/{property_id}/equipments/", headers=other_headers).status_code,
+            404,
+        )
+        self.assertEqual(
+            self.client.put(
+                f"/properties/{property_id}/equipments/{property_equipment_id}",
+                json={"quantity": 4},
+                headers=other_headers,
+            ).status_code,
+            404,
+        )
+        self.assertEqual(
+            self.client.delete(
+                f"/properties/{property_id}/equipments/{property_equipment_id}",
+                headers=other_headers,
+            ).status_code,
+            404,
+        )
+        self.assertEqual(
+            self.client.get(f"/properties/{property_id}/consumption-report", headers=other_headers).status_code,
+            404,
+        )
+
+        update_response = self.client.put(
+            f"/properties/{property_id}/equipments/{property_equipment_id}",
+            json={"quantity": 3, "hours_per_day": 2},
+            headers=owner_headers,
+        )
+        self.assertEqual(update_response.status_code, 200)
+        self.assertEqual(update_response.json()["quantity"], 3)
+        self.assertEqual(update_response.json()["hours_per_day"], 2)
+
+        report_response = self.client.get(
+            f"/properties/{property_id}/consumption-report", headers=owner_headers
+        )
+        self.assertEqual(report_response.status_code, 200)
+        report = report_response.json()
+        self.assertEqual(report["items"][0]["monthly_consumption_kwh"], 180)
+        self.assertEqual(report["total_monthly_consumption_kwh"], 180)
+
+        self.assertEqual(
+            self.client.delete(
+                f"/properties/{property_id}/equipments/{property_equipment_id}",
+                headers=owner_headers,
+            ).status_code,
+            200,
+        )
+        self.assertEqual(
+            self.client.get(f"/properties/{property_id}/equipments/", headers=owner_headers).json(), []
+        )

@@ -188,7 +188,16 @@ async def create_property_equipment(
     equipment = equipment_crud.get_equipment(db, property_equipment.equipment_id)
     if equipment is None:
         raise HTTPException(status_code=404, detail="Equipment not found")
-    
+
+    existing_link = equipment_crud.get_property_equipment_by_equipment_id(
+        db, property_id, property_equipment.equipment_id
+    )
+    if existing_link is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Equipment is already linked to this property",
+        )
+
     created = equipment_crud.create_property_equipment(db, property_id, property_equipment, user_id=current_user.id)
     if created is None:
         raise HTTPException(status_code=404, detail="Property not found")

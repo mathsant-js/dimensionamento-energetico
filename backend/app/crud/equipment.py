@@ -27,6 +27,13 @@ def get_property_equipment(db: Session, property_equipment_id: int):
         models.PropertyEquipment.id == property_equipment_id
     ).first()
 
+
+def get_property_equipment_by_equipment_id(db: Session, property_id: int, equipment_id: int):
+    return db.query(models.PropertyEquipment).filter(
+        models.PropertyEquipment.property_id == property_id,
+        models.PropertyEquipment.equipment_id == equipment_id,
+    ).first()
+
 def get_property_equipments(db: Session, property_id: int, user_id: int, skip: int = 0, limit: int = 100):
     query = db.query(models.PropertyEquipment).join(
         models.Property,

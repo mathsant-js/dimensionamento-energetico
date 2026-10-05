@@ -168,6 +168,8 @@
   font-weight: 600;
   color: #1a1a1a;
 }
+
+.equipments-table-container {
   overflow-x: auto;
   border-radius: 6px;
   border: 1px solid #e0e0e0;
