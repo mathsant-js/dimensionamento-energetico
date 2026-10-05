@@ -44,6 +44,9 @@ button:disabled { cursor: wait; opacity: .65; }
 .card-actions button { padding: 8px 11px; font-size: .82rem; }
 .empty-state { border: 1px dashed #31505e; border-radius: 16px; color: #9cb1c3; padding: 44px 22px; text-align: center; }
 .catalog-section { max-width: 900px; margin: 0 auto; }
+.equipment-manager { max-width: 900px; margin: 0 auto; }
+.equipment-manager > .subtitle { margin-top: -8px; }
+.equipment-link-form { max-width: none; margin: 0 0 28px; }
 .catalog-header { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 28px; }
 .catalog-header h1 { font-size: clamp(2.1rem, 5vw, 3.6rem); max-width: 620px; }
 .catalog-header .subtitle { margin-bottom: 0; }

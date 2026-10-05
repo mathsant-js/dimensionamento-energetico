@@ -3,6 +3,7 @@ import api from '../../api.ts';
 import PropertyEditForm from './PropertyEditForm.tsx';
 import PropertyDeleteModal from './PropertyDeleteModal.tsx';
 import ConsumptionReport from './ConsumptionReport.tsx';
+import PropertyEquipmentManager from './PropertyEquipmentManager.tsx';
 import { PropertyRead } from '../../types/property.ts';
 
 interface PropertyListProps {
@@ -16,6 +17,7 @@ const PropertyList: React.FC<PropertyListProps> = ({ token, refreshVersion, onCh
   const [deletingPropertyId, setDeletingPropertyId] = useState<number | null>(null);
   const [editingPropertyId, setEditingPropertyId] = useState<number | null>(null);
   const [viewingReportPropertyId, setViewingReportPropertyId] = useState<number | null>(null);
+  const [managingEquipmentPropertyId, setManagingEquipmentPropertyId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -49,6 +51,10 @@ const PropertyList: React.FC<PropertyListProps> = ({ token, refreshVersion, onCh
     setViewingReportPropertyId(propertyId);
   };
 
+  const handleManageEquipment = (propertyId: number) => {
+    setManagingEquipmentPropertyId(propertyId);
+  };
+
   const confirmDelete = async () => {
     if (deletingPropertyId === null) return;
     setIsDeleting(true);
@@ -75,6 +81,20 @@ const PropertyList: React.FC<PropertyListProps> = ({ token, refreshVersion, onCh
           propertyName={property.identification}
           onClose={() => setViewingReportPropertyId(null)}
           token={token}
+        />
+      );
+    }
+  }
+
+  if (managingEquipmentPropertyId !== null) {
+    const property = properties.find((item) => item.id === managingEquipmentPropertyId);
+    if (property) {
+      return (
+        <PropertyEquipmentManager
+          propertyId={managingEquipmentPropertyId}
+          propertyName={property.identification}
+          token={token}
+          onClose={() => setManagingEquipmentPropertyId(null)}
         />
       );
     }
@@ -107,7 +127,8 @@ const PropertyList: React.FC<PropertyListProps> = ({ token, refreshVersion, onCh
                 />
               ) : (
                 <>
-                  <div className="card-actions"><button className="secondary-button" onClick={() => handleViewReport(property.id)}>Relatório</button>
+                  <div className="card-actions"><button className="secondary-button" onClick={() => handleManageEquipment(property.id)}>Gerenciar equipamentos</button>
+                  <button className="secondary-button" onClick={() => handleViewReport(property.id)}>Relatório</button>
                   <button className="secondary-button" onClick={() => handleEdit(property.id)}>Editar</button>
                   <button className="danger-button" onClick={() => handleDelete(property.id)}>Excluir</button></div>
                 </>
