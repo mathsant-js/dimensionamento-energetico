@@ -47,7 +47,7 @@ Prioridades: `P0` bloqueia a fundação ou a segurança do fluxo; `P1` entrega o
 | TASK-25 | Motor | P0 | 19, 21, 24 | Review |
 | TASK-26 | Armazenamento | P0 | 20, 21, 23 | Review |
 | TASK-27 | Armazenamento | P0 | 25, 26 | Review |
-| TASK-28 | Proposta | P1 | 24, 25, 26, 27 | Backlog |
+| TASK-28 | Proposta | P1 | 24, 25, 26, 27 | Review |
 | TASK-29 | Integração | P1 | 17, 21, 22, 23, 24, 25, 26, 27, 28 | Backlog |
 | TASK-30 | Integração | P1 | contrato estável de 29 | Backlog |
 | TASK-31 | Integração | P1 | 28, 29, 30 | Backlog |
