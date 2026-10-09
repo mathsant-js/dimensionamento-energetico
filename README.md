@@ -41,6 +41,8 @@ Desenvolvido como projeto acadêmico da FIAP.
 
 O projeto também possui especificações para evolução de dimensionamento fotovoltaico, incluindo seleção de módulos e inversores, armazenamento em baterias e orçamento. Esses recursos ainda não estão implementados no aplicativo atual. Consulte `AGENTS.md` e `SPEC.md` para o escopo planejado.
 
+O planejamento executável da Sprint 2 está documentado em [`docs/plano_desenvolvimento_sprint2.md`](docs/plano_desenvolvimento_sprint2.md). O estado das tasks e suas prioridades pode ser acompanhado no [`backlog versionado`](docs/backlog_sprint2.md), e as convenções técnicas aprovadas estão no [`ADR-001`](docs/adr/ADR-001-decisoes-dimensionamento-fotovoltaico.md).
+
 ## Arquitetura
 
 - **Frontend:** React 19, TypeScript, Axios, Recharts e Create React App.
