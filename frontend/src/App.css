@@ -41,6 +41,7 @@ button:disabled { cursor: wait; opacity: .65; }
 .property-meta { color: #92aab9; font-size: .88rem; margin: 5px 0 0; }
 .property-address { color: #b8cad7; margin: 14px 0 0; font-size: .9rem; }
 .card-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.card-actions { flex-wrap: wrap; justify-content: flex-end; }
 .card-actions button { padding: 8px 11px; font-size: .82rem; }
 .empty-state { border: 1px dashed #31505e; border-radius: 16px; color: #9cb1c3; padding: 44px 22px; text-align: center; }
 .catalog-section { max-width: 900px; margin: 0 auto; }
@@ -72,6 +73,21 @@ button:disabled { cursor: wait; opacity: .65; }
 .alert { background: rgba(251, 113, 133, .12); border: 1px solid rgba(251, 113, 133, .35); border-radius: 9px; color: #fecdd3; padding: 10px 12px; font-size: .9rem; }
 .solar-resource-section { max-width: 900px; margin: 0 auto; }
 .solar-resource-section > .secondary-button { margin-bottom: 24px; }
+.pv-sizing-section { max-width: 900px; margin: 0 auto; }
+.pv-sizing-section > .secondary-button { margin-bottom: 24px; }
+.consumption-badge { display: grid; gap: 3px; min-width: 220px; padding: 14px 16px; border: 1px solid rgba(103, 232, 249, .25); border-radius: 12px; background: rgba(34, 211, 238, .07); }
+.consumption-badge span, .consumption-badge small { color: #92aab9; font-size: .76rem; }
+.consumption-badge strong { color: #67e8f9; font-size: 1.08rem; }
+.pv-form { max-width: none; }
+.field-error { color: #fda4af; font-size: .78rem; }
+input[aria-invalid="true"], select[aria-invalid="true"] { border-color: #fb7185; }
+.battery-fieldset { margin: 24px 0 0; padding: 18px; border: 1px solid #284553; border-radius: 12px; }
+.checkbox-field { display: flex; align-items: center; gap: 10px; color: #ecfeff; }
+.checkbox-field input { width: auto; accent-color: #22d3ee; }
+.battery-fields { margin-top: 18px; }
+.simulation-status { margin-top: 22px; padding: 24px; border: 1px solid rgba(52, 211, 153, .35); border-radius: 14px; background: rgba(52, 211, 153, .08); }
+.simulation-status h2 { margin-top: 8px; }
+.simulation-status p { color: #b8cad7; margin-bottom: 0; }
 .success-message { margin: 22px 0 0; padding: 12px 14px; border: 1px solid rgba(52, 211, 153, .35); border-radius: 9px; background: rgba(52, 211, 153, .1); color: #a7f3d0; }
 .modal-backdrop { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 24px; background: rgba(2, 8, 12, .7); backdrop-filter: blur(4px); }
 .modal { max-width: 380px; background: #10202c; border: 1px solid #31505e; border-radius: 16px; padding: 26px; box-shadow: 0 24px 70px #000; }
