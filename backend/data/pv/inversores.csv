@@ -1,0 +1,9 @@
+id,fabricante,modelo,tipo,potencia_nominal_w,potencia_max_fv_w,tensao_max_entrada_v,faixa_mppt_min_v,faixa_mppt_max_v,corrente_max_entrada_a,numero_mppt,compativel_bateria,preco_brl,fornecedor,data_coleta,url_fonte
+INV-GRO-2500-001,Growatt,MIN 2500TL-X,on-grid,2500,3500,500,80,500,13.5,2,false,2899.00,Mercado Livre,2026-10-09,https://au.growatt.com/upload/file/MIN_2500_6000_TL_X.pdf
+INV-GRO-3000-001,Growatt,MIN 3000TL-X,on-grid,3000,4200,500,80,500,13.5,2,false,3224.73,Minha Casa Solar,2026-10-09,https://au.growatt.com/upload/file/MIN_2500_6000_TL_X.pdf
+INV-GRO-3600-001,Growatt,MIN 3600TL-X,on-grid,3600,5040,550,80,550,13.5,2,false,3499.00,Mercado Livre,2026-10-09,https://au.growatt.com/upload/file/MIN_2500_6000_TL_X.pdf
+INV-GRO-4200-001,Growatt,MIN 4200TL-X,on-grid,4200,5880,550,80,550,13.5,2,false,3799.00,Mercado Livre,2026-10-09,https://au.growatt.com/upload/file/MIN_2500_6000_TL_X.pdf
+INV-GRO-5000-001,Growatt,MIN 5000TL-X,on-grid,5000,7000,550,80,550,13.5,2,false,3999.00,Energy Shop,2026-10-09,https://au.growatt.com/upload/file/MIN_2500_6000_TL_X.pdf
+INV-GRO-6000-001,Growatt,MIN 6000TL-X,on-grid,6000,8100,550,80,550,13.5,2,false,3699.00,Minha Casa Solar,2026-10-09,https://au.growatt.com/upload/file/MIN_2500_6000_TL_X.pdf
+INV-DEY-5000-001,Deye,SUN-5K-SG01LP1-US,hibrido,5000,6500,500,150,425,26,2,true,15912.90,Apex Solar,2026-10-09,https://pt.deyeinverter.com/deyeinverter/2024/11/20/datasheet_sun-5-8kk-sg01lp1-us_241120_pt.pdf
+INV-DEY-8000-001,Deye,SUN-8K-SG01LP1-US,hibrido,8000,10400,500,150,425,52,2,true,19116.23,Só Solar,2026-10-09,https://pt.deyeinverter.com/deyeinverter/2024/11/20/datasheet_sun-5-8kk-sg01lp1-us_241120_pt.pdf
