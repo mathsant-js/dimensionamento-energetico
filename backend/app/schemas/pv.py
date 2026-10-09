@@ -148,3 +148,177 @@ class PVProposalRead(PVProposalCreate):
     created_at: datetime
     updated_at: datetime
     items: List[PVProposalItemRead]
+
+
+class PVAdditionalCostInput(BaseModel):
+    description: str = Field(..., min_length=1, max_length=300)
+    value_brl: Money = Field(..., ge=0)
+
+    @field_validator("description", mode="before")
+    @classmethod
+    def strip_description(cls, value):
+        value = value.strip() if isinstance(value, str) else value
+        if not value:
+            raise ValueError("descrição do custo adicional não pode ser vazia")
+        return value
+
+
+class PVSimulationRequest(BaseModel):
+    """Parâmetros controláveis; consumo, preços e especificações não vêm do cliente."""
+
+    model_config = ConfigDict(json_schema_extra={"example": {
+        "hsp_kwh_m2_day": "5.10",
+        "hsp_source": "Atlas Brasileiro de Energia Solar",
+        "hsp_source_date": "2026-10-09",
+        "target_offset_fraction": "0.80",
+        "period_days": 30,
+        "performance_ratio": "0.80",
+        "module_catalog_id": "MOD-CAN-550-001",
+        "inverter_catalog_id": "INV-GRO-3000-001",
+        "autonomy_hours": "0",
+        "battery_efficiency": "0.95",
+        "additional_costs": [{"description": "Instalação", "value_brl": "1500.00"}],
+    }})
+
+    hsp_kwh_m2_day: Decimal = Field(..., gt=0)
+    hsp_source: str = Field(..., min_length=1, max_length=500)
+    hsp_source_date: date
+    target_offset_fraction: Decimal = Field(Decimal("1"), gt=0, le=1)
+    period_days: int = Field(30, gt=0, le=31)
+    performance_ratio: Decimal = Field(Decimal("0.80"), gt=0, le=1)
+    module_catalog_id: Optional[str] = Field(None, min_length=1, max_length=100)
+    inverter_catalog_id: Optional[str] = Field(None, min_length=1, max_length=100)
+    autonomy_hours: Decimal = Field(Decimal("0"), ge=0, le=24)
+    battery_efficiency: Decimal = Field(Decimal("0.95"), gt=0, le=1)
+    battery_catalog_id: Optional[str] = Field(None, min_length=1, max_length=100)
+    additional_costs: List[PVAdditionalCostInput] = Field(default_factory=list, max_length=50)
+
+    @field_validator("hsp_source", "module_catalog_id", "inverter_catalog_id", "battery_catalog_id", mode="before")
+    @classmethod
+    def strip_optional_text(cls, value):
+        if isinstance(value, str):
+            value = value.strip()
+        return value
+
+    @model_validator(mode="after")
+    def validate_storage_selection(self):
+        if self.autonomy_hours > 0 and not self.battery_catalog_id:
+            raise ValueError("battery_catalog_id é obrigatório quando autonomy_hours > 0")
+        if self.autonomy_hours == 0 and self.battery_catalog_id is not None:
+            raise ValueError("battery_catalog_id não deve ser informado quando autonomy_hours = 0")
+        return self
+
+
+class PVQuantityRead(BaseModel):
+    value: Decimal
+    unit: str
+
+
+class PVModuleOptionRead(BaseModel):
+    catalog_id: str
+    manufacturer: str
+    model: str
+    module_power_wp: Decimal
+    module_quantity: int
+    installed_power_kwp: Decimal
+    unit_price_brl: Decimal
+    total_price_brl: Decimal
+
+
+class PVStringArrangementRead(BaseModel):
+    mppt_id: int
+    module_quantity: int
+    voc_v: Decimal
+    vmp_v: Decimal
+
+
+class PVCompatibleInverterRead(BaseModel):
+    catalog_id: str
+    manufacturer: str
+    model: str
+    inverter_type: str
+    battery_compatible: bool
+    unit_price_brl: Decimal
+    installed_pv_power_w: Decimal
+    arrangement: List[PVStringArrangementRead]
+
+
+class PVIncompatibilityReasonRead(BaseModel):
+    code: str
+    message: str
+    actual: Optional[Decimal] = None
+    limit: Optional[Decimal] = None
+    mppt_id: Optional[int] = None
+    module_quantity: Optional[int] = None
+
+
+class PVRejectedInverterRead(BaseModel):
+    catalog_id: str
+    manufacturer: str
+    model: str
+    reasons: List[PVIncompatibilityReasonRead]
+
+
+class PVStorageRead(BaseModel):
+    storage_requested: bool
+    daily_consumption: PVQuantityRead
+    autonomy: PVQuantityRead
+    autonomy_energy: PVQuantityRead
+    battery_efficiency: PVQuantityRead
+    battery_catalog_id: Optional[str]
+    depth_of_discharge: PVQuantityRead
+    required_nominal_capacity: PVQuantityRead
+    battery_quantity: int
+    installed_nominal_capacity: PVQuantityRead
+    installed_deliverable_energy: PVQuantityRead
+    total_battery_cost: PVQuantityRead
+
+
+class PVBOMItemRead(BaseModel):
+    category: str
+    description: str
+    quantity: int
+    unit: str
+    unit_price_brl: Decimal
+    subtotal_brl: Decimal
+    catalog_id: Optional[str] = None
+    manufacturer: Optional[str] = None
+    model: Optional[str] = None
+    supplier: Optional[str] = None
+    source_url: Optional[str] = None
+
+
+class PVBudgetRead(BaseModel):
+    currency: str
+    items: List[PVBOMItemRead]
+    modules_cost_brl: Decimal
+    inverter_cost_brl: Decimal
+    batteries_cost_brl: Decimal
+    additional_cost_brl: Decimal
+    equipment_cost_brl: Decimal
+    total_cost_brl: Decimal
+
+
+class PVCalculationRead(BaseModel):
+    reference_consumption: PVQuantityRead
+    target_offset: PVQuantityRead
+    hsp: PVQuantityRead
+    period_days: PVQuantityRead
+    performance_ratio: PVQuantityRead
+    target_energy: PVQuantityRead
+    required_pv_power: PVQuantityRead
+
+
+class PVSimulationRead(BaseModel):
+    property_id: int
+    consumption_calculated_at: datetime
+    calculation: PVCalculationRead
+    module_alternatives: List[PVModuleOptionRead]
+    selected_module: PVModuleOptionRead
+    compatible_inverters: List[PVCompatibleInverterRead]
+    rejected_inverters: List[PVRejectedInverterRead]
+    selected_inverter: Optional[PVCompatibleInverterRead]
+    storage: PVStorageRead
+    budget: Optional[PVBudgetRead]
+    methodology_version: str
+    disclaimer: str

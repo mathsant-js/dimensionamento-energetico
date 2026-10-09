@@ -7,4 +7,4 @@ pydantic[email]
 pydantic-settings
 sqlalchemy
 alembic
-httpx2
+httpx

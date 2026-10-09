@@ -14,6 +14,7 @@ from .schemas import user as user_schema, property as property_schema, equipment
 from .schemas.user import Token
 from .schemas.pv import PropertySolarResourceRead, PropertySolarResourceUpsert
 from .core.config import settings
+from .routers.pv import router as pv_router
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -34,6 +35,7 @@ def get_db() -> Generator[Session, None, None]:
         db.close()
 
 app = FastAPI()
+app.include_router(pv_router)
 
 app.add_middleware(
     CORSMiddleware,
