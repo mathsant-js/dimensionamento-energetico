@@ -35,7 +35,8 @@ Desenvolvido como projeto acadêmico da FIAP.
 - Total mensal calculado pelo backend.
 - Relatório com tabela detalhada, maior consumidor, percentuais e gráficos de pizza e barras.
 - Isolamento dos dados por usuário autenticado.
-- Persistência em SQLite via SQLAlchemy.
+- Persistência em SQLite via SQLAlchemy e evolução de schema com Alembic.
+- Fundação de propostas fotovoltaicas com snapshots técnicos/comerciais e isolamento por usuário (Sprint 2).
 
 ## Escopo futuro
 
@@ -67,6 +68,7 @@ cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+alembic upgrade head
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
@@ -107,7 +109,9 @@ Ao iniciar o backend, o catálogo de equipamentos é preenchido automaticamente 
 
 ```text
 backend/
+  alembic/             Migrations versionadas do banco de dados
   app/                 API FastAPI, modelos, schemas e regras de negócio
+  tests/               Testes automatizados do backend
   requirements.txt     Dependências Python
 frontend/
   src/                 Aplicação React e TypeScript
@@ -122,6 +126,15 @@ Para gerar o build de produção do frontend:
 ```bash
 cd frontend
 npm run build
+```
+
+Para validar as migrations e a persistência de propostas:
+
+```bash
+cd backend
+python -m unittest discover -s tests -v
+alembic upgrade head
+alembic downgrade -1
 ```
 
 O projeto também inclui scripts de verificação manual no diretório `backend`, incluindo o teste de isolamento de dados entre usuários.
