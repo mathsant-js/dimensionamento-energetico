@@ -1,7 +1,34 @@
-from sqlalchemy import Boolean, Column, Date, DateTime, ForeignKey, Integer, JSON, Numeric, String, Text, func
+from sqlalchemy import Boolean, Column, Date, DateTime, ForeignKey, Integer, JSON, Numeric, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import relationship
 
 from ..database import Base
+
+
+class PropertySolarResource(Base):
+    """HSP confirmed for a property, with its source and location provenance."""
+
+    __tablename__ = "property_solar_resources"
+    __table_args__ = (UniqueConstraint("property_id", name="uq_property_solar_resource_property"),)
+
+    id = Column(Integer, primary_key=True, index=True)
+    property_id = Column(
+        Integer, ForeignKey("properties.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    hsp_kwh_m2_day = Column(Numeric(8, 3), nullable=False)
+    unit = Column(String(30), nullable=False, default="kWh/m²/dia")
+    source = Column(Text, nullable=False)
+    source_date = Column(Date, nullable=False)
+    acquisition_mode = Column(String(30), nullable=False, default="manual")
+    location_city = Column(String(100), nullable=True)
+    location_state = Column(String(50), nullable=True)
+    location_latitude = Column(Numeric(10, 7), nullable=True)
+    location_longitude = Column(Numeric(10, 7), nullable=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = Column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+    property = relationship("Property", back_populates="solar_resource")
 
 
 class PVProposal(Base):

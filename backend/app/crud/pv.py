@@ -2,12 +2,56 @@ from typing import Optional
 
 from sqlalchemy.orm import Session, joinedload
 
-from ..models import PVProposal, PVProposalItem, Property
-from ..schemas.pv import PVProposalCreate
+from ..models import PVProposal, PVProposalItem, Property, PropertySolarResource
+from ..schemas.pv import PVProposalCreate, PropertySolarResourceUpsert
 
 
 def _owned_property(db: Session, property_id: int, user_id: int) -> Optional[Property]:
     return db.query(Property).filter(Property.id == property_id, Property.user_id == user_id).first()
+
+
+def get_solar_resource(
+    db: Session, property_id: int, user_id: int
+) -> Optional[PropertySolarResource]:
+    return (
+        db.query(PropertySolarResource)
+        .join(Property, PropertySolarResource.property_id == Property.id)
+        .filter(
+            PropertySolarResource.property_id == property_id,
+            Property.user_id == user_id,
+        )
+        .first()
+    )
+
+
+def upsert_solar_resource(
+    db: Session,
+    property_id: int,
+    user_id: int,
+    resource: PropertySolarResourceUpsert,
+) -> Optional[PropertySolarResource]:
+    """Persist a confirmed HSP and snapshot the property's current location."""
+    owned_property = _owned_property(db, property_id, user_id)
+    if owned_property is None:
+        return None
+
+    db_resource = get_solar_resource(db, property_id, user_id)
+    values = resource.model_dump()
+    values.update(
+        location_city=owned_property.city,
+        location_state=owned_property.state,
+        location_latitude=owned_property.latitude,
+        location_longitude=owned_property.longitude,
+    )
+    if db_resource is None:
+        db_resource = PropertySolarResource(property_id=property_id, **values)
+        db.add(db_resource)
+    else:
+        for field, value in values.items():
+            setattr(db_resource, field, value)
+    db.commit()
+    db.refresh(db_resource)
+    return db_resource
 
 
 def create_proposal(

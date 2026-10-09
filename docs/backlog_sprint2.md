@@ -41,7 +41,7 @@ Prioridades: `P0` bloqueia a fundação ou a segurança do fluxo; `P1` entrega o
 | TASK-19 | Dados FV | P0 | 16 | Review |
 | TASK-20 | Dados FV | P0 | 16 | Review |
 | TASK-21 | Dados FV | P0 | 18, 19, 20 | Review |
-| TASK-22 | Dados FV | P0 | 16 | To Do |
+| TASK-22 | Dados FV | P0 | 16 | Done |
 | TASK-23 | Motor | P0 | 22 | Backlog |
 | TASK-24 | Motor | P0 | 21, 23 | Backlog |
 | TASK-25 | Motor | P0 | 19, 21, 24 | Backlog |

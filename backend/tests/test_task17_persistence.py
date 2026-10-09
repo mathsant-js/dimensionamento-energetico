@@ -164,7 +164,7 @@ class MigrationTests(unittest.TestCase):
             set(inspect(create_engine(f"sqlite:///{database_path}")).get_table_names())
         ))
 
-        command.downgrade(config, "-1")
+        command.downgrade(config, "20261009_0001")
         tables = set(inspect(create_engine(f"sqlite:///{database_path}")).get_table_names())
         self.assertNotIn("pv_proposals", tables)
         self.assertNotIn("pv_proposal_items", tables)

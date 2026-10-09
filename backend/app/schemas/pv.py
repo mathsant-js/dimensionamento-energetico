@@ -6,6 +6,38 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 
 Money = Decimal
+HSP_UNIT = "kWh/m²/dia"
+
+
+class PropertySolarResourceUpsert(BaseModel):
+    hsp_kwh_m2_day: Decimal = Field(..., gt=0, max_digits=8, decimal_places=3)
+    unit: Literal["kWh/m²/dia"] = HSP_UNIT
+    source: str = Field(..., min_length=1, max_length=500)
+    source_date: date
+    # Location-based sources will be added only when a trusted provider is configured.
+    acquisition_mode: Literal["manual"] = "manual"
+
+    @field_validator("source", mode="before")
+    @classmethod
+    def strip_source(cls, value):
+        if isinstance(value, str):
+            value = value.strip()
+        if not value:
+            raise ValueError("origem do HSP não pode ser vazia")
+        return value
+
+
+class PropertySolarResourceRead(PropertySolarResourceUpsert):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    property_id: int
+    location_city: Optional[str] = None
+    location_state: Optional[str] = None
+    location_latitude: Optional[Decimal] = None
+    location_longitude: Optional[Decimal] = None
+    created_at: datetime
+    updated_at: datetime
 
 
 class PVProposalItemCreate(BaseModel):
@@ -47,7 +79,7 @@ class PVProposalCreate(BaseModel):
     reference_consumption_kwh_month: Decimal = Field(..., gt=0)
     consumption_calculated_at: datetime
     hsp_kwh_m2_day: Decimal = Field(..., gt=0)
-    hsp_unit: str = Field("kWh/m²/dia", min_length=1, max_length=30)
+    hsp_unit: Literal["kWh/m²/dia"] = HSP_UNIT
     hsp_source: str = Field(..., min_length=1)
     hsp_source_date: date
     hsp_is_manual: bool = True

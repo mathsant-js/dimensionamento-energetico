@@ -70,6 +70,9 @@ button:disabled { cursor: wait; opacity: .65; }
 .equipment-card p { color: #92aab9; font-size: .88rem; margin: 5px 0 0; }
 .equipment-card strong { color: #67e8f9; white-space: nowrap; font-size: 1.12rem; }
 .alert { background: rgba(251, 113, 133, .12); border: 1px solid rgba(251, 113, 133, .35); border-radius: 9px; color: #fecdd3; padding: 10px 12px; font-size: .9rem; }
+.solar-resource-section { max-width: 900px; margin: 0 auto; }
+.solar-resource-section > .secondary-button { margin-bottom: 24px; }
+.success-message { margin: 22px 0 0; padding: 12px 14px; border: 1px solid rgba(52, 211, 153, .35); border-radius: 9px; background: rgba(52, 211, 153, .1); color: #a7f3d0; }
 .modal-backdrop { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 24px; background: rgba(2, 8, 12, .7); backdrop-filter: blur(4px); }
 .modal { max-width: 380px; background: #10202c; border: 1px solid #31505e; border-radius: 16px; padding: 26px; box-shadow: 0 24px 70px #000; }
 .modal h3 { margin-top: 0; }.modal p { color: #a9bfcc; line-height: 1.5; }

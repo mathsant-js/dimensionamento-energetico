@@ -6,12 +6,13 @@ from datetime import timedelta
 from typing import List
 
 from .database import Base, engine, SessionLocal
-from .crud import property as property_crud, user as user_crud, equipment as equipment_crud
+from .crud import property as property_crud, user as user_crud, equipment as equipment_crud, pv as pv_crud
 from . import schemas, models
 from .seed import seed_equipments
 from .auth import authenticate_user, create_access_token, get_current_active_user
 from .schemas import user as user_schema, property as property_schema, equipment as equipment_schema
 from .schemas.user import Token
+from .schemas.pv import PropertySolarResourceRead, PropertySolarResourceUpsert
 from .core.config import settings
 
 # Create database tables
@@ -132,6 +133,40 @@ async def delete_property(
     if db_property is None:
         raise HTTPException(status_code=404, detail="Property not found")
     return {"message": "Property deleted successfully"}
+
+
+@app.get(
+    "/properties/{property_id}/solar-resource",
+    response_model=PropertySolarResourceRead,
+)
+async def read_property_solar_resource(
+    property_id: int,
+    current_user: user_schema.UserRead = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    resource = pv_crud.get_solar_resource(db, property_id, current_user.id)
+    if resource is None:
+        raise HTTPException(
+            status_code=404,
+            detail="HSP não configurado para esta residência",
+        )
+    return resource
+
+
+@app.put(
+    "/properties/{property_id}/solar-resource",
+    response_model=PropertySolarResourceRead,
+)
+async def upsert_property_solar_resource(
+    property_id: int,
+    resource: PropertySolarResourceUpsert,
+    current_user: user_schema.UserRead = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    saved = pv_crud.upsert_solar_resource(db, property_id, current_user.id, resource)
+    if saved is None:
+        raise HTTPException(status_code=404, detail="Property not found")
+    return saved
 
 
 # Equipment Endpoints
