@@ -6,6 +6,7 @@ from typing import Optional, Sequence, Tuple
 
 from app.schemas.pv_catalog import PVInverter, PVModule
 from app.services.pv_module_selection import PVModuleOption
+from app.services.storage_sizing import StorageSizingResult
 
 
 VOLTAGE_QUANTUM = Decimal("0.001")
@@ -34,8 +35,8 @@ class PVStringArrangement:
 class IncompatibilityReason:
     code: str
     message: str
-    actual: Decimal
-    limit: Decimal
+    actual: Optional[Decimal] = None
+    limit: Optional[Decimal] = None
     mppt_id: Optional[int] = None
     module_quantity: Optional[int] = None
 
@@ -136,8 +137,14 @@ def select_inverters(
     module_option: PVModuleOption,
     module: PVModule,
     inverters: Sequence[PVInverter],
+    storage: Optional[StorageSizingResult] = None,
 ) -> PVInverterSelection:
-    """Valida potência e cada string; ordena por preço só os elegíveis."""
+    """Valida a arquitetura completa e ordena por preço só os elegíveis.
+
+    Quando ``storage`` representa autonomia ativa, inversores sem suporte a
+    bateria são rejeitados depois das verificações elétricas. Autonomia zero
+    mantém os inversores on-grid elegíveis, conforme o ADR-001.
+    """
 
     if not isinstance(module_option, PVModuleOption):
         raise PVInverterSelectionError("module_option", "deve ser uma opção dimensionada")
@@ -147,6 +154,10 @@ def select_inverters(
         raise PVInverterSelectionError("module", "não corresponde à opção dimensionada")
     if not inverters:
         raise PVInverterSelectionError("inverters", "catálogo de inversores vazio")
+    if storage is not None and not isinstance(storage, StorageSizingResult):
+        raise PVInverterSelectionError(
+            "storage", "deve ser um resultado de dimensionamento de armazenamento"
+        )
 
     installed_power_w = (
         Decimal(module_option.module_quantity) * module.potencia_wp
@@ -184,6 +195,20 @@ def select_inverters(
             ))
             continue
 
+        if storage is not None and storage.storage_requested and not inverter.compativel_bateria:
+            rejected.append(RejectedInverter(
+                catalog_id=inverter.id,
+                manufacturer=inverter.fabricante,
+                model=inverter.modelo,
+                reasons=(IncompatibilityReason(
+                    code="STORAGE_REQUIRES_BATTERY_COMPATIBLE_INVERTER",
+                    message=(
+                        "armazenamento ativo exige inversor compatível com bateria"
+                    ),
+                ),),
+            ))
+            continue
+
         compatible.append(CompatibleInverter(
             catalog_id=inverter.id,
             manufacturer=inverter.fabricante,
@@ -200,4 +225,40 @@ def select_inverters(
             compatible, key=lambda item: (item.unit_price_brl, item.catalog_id)
         )),
         rejected=tuple(rejected),
+    )
+
+
+def require_budget_eligible_inverter(
+    selection: PVInverterSelection,
+    inverter_catalog_id: str,
+) -> CompatibleInverter:
+    """Retorna uma opção elegível ou bloqueia o orçamento incompatível."""
+
+    if not isinstance(selection, PVInverterSelection):
+        raise PVInverterSelectionError("selection", "deve ser uma seleção de inversores")
+    normalized_id = (
+        inverter_catalog_id.strip() if isinstance(inverter_catalog_id, str) else ""
+    )
+    if not normalized_id:
+        raise PVInverterSelectionError("inverter_catalog_id", "não pode ser vazio")
+
+    eligible = next(
+        (item for item in selection.compatible if item.catalog_id == normalized_id),
+        None,
+    )
+    if eligible is not None:
+        return eligible
+
+    rejected = next(
+        (item for item in selection.rejected if item.catalog_id == normalized_id),
+        None,
+    )
+    if rejected is not None:
+        reason_codes = ", ".join(reason.code for reason in rejected.reasons)
+        raise PVInverterSelectionError(
+            "inverter_catalog_id",
+            f"inversor incompatível não pode ser orçado ({reason_codes})",
+        )
+    raise PVInverterSelectionError(
+        "inverter_catalog_id", "inversor não pertence ao resultado da seleção"
     )

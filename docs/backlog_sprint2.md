@@ -46,7 +46,7 @@ Prioridades: `P0` bloqueia a fundação ou a segurança do fluxo; `P1` entrega o
 | TASK-24 | Motor | P0 | 21, 23 | Review |
 | TASK-25 | Motor | P0 | 19, 21, 24 | Review |
 | TASK-26 | Armazenamento | P0 | 20, 21, 23 | Review |
-| TASK-27 | Armazenamento | P0 | 25, 26 | Backlog |
+| TASK-27 | Armazenamento | P0 | 25, 26 | Review |
 | TASK-28 | Proposta | P1 | 24, 25, 26, 27 | Backlog |
 | TASK-29 | Integração | P1 | 17, 21, 22, 23, 24, 25, 26, 27, 28 | Backlog |
 | TASK-30 | Integração | P1 | contrato estável de 29 | Backlog |
@@ -61,7 +61,7 @@ O grafo foi organizado como um DAG. TASK-30 pode começar com mocks somente apó
 
 | Backlog | To Do | In Progress | Review | Done |
 |---|---|---|---|---|
-| TASK-27–TASK-34 | — | — | TASK-17, TASK-18, TASK-19, TASK-20, TASK-21, TASK-23, TASK-24, TASK-25, TASK-26 | TASK-16, TASK-22 |
+| TASK-28–TASK-34 | — | — | TASK-17, TASK-18, TASK-19, TASK-20, TASK-21, TASK-23, TASK-24, TASK-25, TASK-26, TASK-27 | TASK-16, TASK-22 |
 
 ### Políticas do quadro
 
