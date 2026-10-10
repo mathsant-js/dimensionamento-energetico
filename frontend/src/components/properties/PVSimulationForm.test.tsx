@@ -38,6 +38,29 @@ const solarResource = {
   updated_at: '2026-10-09T12:00:00Z',
 };
 
+const simulation = {
+  property_id: 7,
+  consumption_calculated_at: '2026-10-09T12:00:00Z',
+  calculation: {
+    reference_consumption: { value: '420.5', unit: 'kWh/mês' },
+    target_offset: { value: '80', unit: '%' },
+    hsp: { value: '5.1', unit: 'kWh/m²/dia' },
+    period_days: { value: '30', unit: 'dias' },
+    performance_ratio: { value: '80', unit: '%' },
+    target_energy: { value: '336.4', unit: 'kWh/mês' },
+    required_pv_power: { value: '2.75', unit: 'kWp' },
+  },
+  module_alternatives: [{ catalog_id: 'MOD-1', manufacturer: 'Solar', model: 'M550', module_power_wp: '550', module_quantity: 5, installed_power_kwp: '2.75', unit_price_brl: '700', total_price_brl: '3500' }],
+  selected_module: { catalog_id: 'MOD-1', manufacturer: 'Solar', model: 'M550', module_power_wp: '550', module_quantity: 5, installed_power_kwp: '2.75', unit_price_brl: '700', total_price_brl: '3500' },
+  compatible_inverters: [{ catalog_id: 'INV-1', manufacturer: 'Volt', model: 'I3000', inverter_type: 'on-grid', battery_compatible: false, unit_price_brl: '2500', installed_pv_power_w: '2750', arrangement: [{ mppt_id: 1, module_quantity: 5, voc_v: '250', vmp_v: '210' }] }],
+  rejected_inverters: [],
+  selected_inverter: null,
+  storage: { storage_requested: false, daily_consumption: { value: '14.02', unit: 'kWh/dia' }, autonomy: { value: '0', unit: 'h' }, autonomy_energy: { value: '0', unit: 'kWh' }, battery_efficiency: { value: '95', unit: '%' }, battery_catalog_id: null, depth_of_discharge: { value: '0', unit: '%' }, required_nominal_capacity: { value: '0', unit: 'kWh' }, battery_quantity: 0, installed_nominal_capacity: { value: '0', unit: 'kWh' }, installed_deliverable_energy: { value: '0', unit: 'kWh' }, total_battery_cost: { value: '0', unit: 'BRL' } },
+  budget: null,
+  methodology_version: 'ADR-001/v1',
+  disclaimer: 'Pré-dimensionamento acadêmico; não substitui projeto executivo.',
+};
+
 const renderForm = () => render(
   <PVSimulationForm
     propertyId={7}
@@ -70,19 +93,7 @@ test('uses the property consumption without asking the user to type it again', a
 
 test('validates fields and sends percentages as fractions to the simulation API', async () => {
   mockedApi.post.mockResolvedValue({
-    data: {
-      property_id: 7,
-      calculation: {
-        reference_consumption: { value: '420.5', unit: 'kWh/mês' },
-        target_energy: { value: '336.4', unit: 'kWh/mês' },
-        required_pv_power: { value: '2.75', unit: 'kWp' },
-      },
-      module_alternatives: [{}],
-      compatible_inverters: [{}],
-      selected_inverter: {},
-      budget: {},
-      disclaimer: 'Preliminar',
-    },
+    data: simulation,
   });
   renderForm();
   await screen.findByText('420,5 kWh/mês');
@@ -105,7 +116,76 @@ test('validates fields and sends percentages as fractions to the simulation API'
     }),
     expect.objectContaining({ headers: { Authorization: 'Bearer token' } }),
   );
-  expect(await screen.findByText(/2.75 kWp necessários/i)).toBeInTheDocument();
+  expect(await screen.findByText(/resumo técnico da solução/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/2,75 kWp/i).length).toBeGreaterThanOrEqual(2);
+  expect(screen.getByText(/sistema sem armazenamento/i)).toBeInTheDocument();
+  expect(screen.getByText(/aviso acadêmico permanente/i)).toBeInTheDocument();
+});
+
+test('selects an inverter, renders the BOM and persists the proposal', async () => {
+  const withBudget = {
+    ...simulation,
+    selected_inverter: simulation.compatible_inverters[0],
+    budget: {
+      currency: 'BRL',
+      items: [
+        { category: 'module', description: 'Módulo Solar M550', quantity: 5, unit: 'unidade', unit_price_brl: '700', subtotal_brl: '3500', catalog_id: 'MOD-1', manufacturer: 'Solar', model: 'M550', supplier: 'Loja Solar', source_url: 'https://example.test/module' },
+        { category: 'inverter', description: 'Inversor Volt I3000', quantity: 1, unit: 'unidade', unit_price_brl: '2500', subtotal_brl: '2500', catalog_id: 'INV-1', manufacturer: 'Volt', model: 'I3000', supplier: 'Loja Solar', source_url: 'https://example.test/inverter' },
+      ],
+      modules_cost_brl: '3500', inverter_cost_brl: '2500', batteries_cost_brl: '0', additional_cost_brl: '0', equipment_cost_brl: '6000', total_cost_brl: '6000',
+    },
+  };
+  mockedApi.post
+    .mockResolvedValueOnce({ data: simulation })
+    .mockResolvedValueOnce({ data: withBudget })
+    .mockResolvedValueOnce({ data: { id: 31, property_id: 7, total_cost_brl: '6000', created_at: '2026-10-10T12:00:00Z' } });
+  renderForm();
+  await screen.findByText('420,5 kWh/mês');
+  fireEvent.click(screen.getByRole('button', { name: /simular sistema/i }));
+  fireEvent.click(await screen.findByRole('button', { name: /selecionar inversor/i }));
+
+  expect(await screen.findByText('Módulo Solar M550')).toBeInTheDocument();
+  expect(screen.getByText('R$ 6.000,00')).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: /salvar proposta preliminar/i }));
+  expect(await screen.findByText(/proposta #31 salva com sucesso/i)).toBeInTheDocument();
+  expect(mockedApi.post).toHaveBeenLastCalledWith(
+    '/api/properties/7/pv/proposals',
+    expect.objectContaining({ inverter_catalog_id: 'INV-1' }),
+    expect.any(Object),
+  );
+});
+
+test('renders storage units and battery costs in the battery scenario', async () => {
+  mockedApi.get.mockImplementation((url: string) => {
+    if (url.includes('consumption-report')) return Promise.resolve({ data: report });
+    if (url.includes('solar-resource')) return Promise.resolve({ data: solarResource });
+    if (url.includes('batteries')) return Promise.resolve({ data: [{ id: 'BAT-1', fabricante: 'Lítio', modelo: 'B5', capacidade_kwh: '5', dod_pct: '90', preco_brl: '9000' }] });
+    return Promise.reject(new Error('unexpected request'));
+  });
+  mockedApi.post.mockResolvedValue({
+    data: {
+      ...simulation,
+      storage: {
+        ...simulation.storage,
+        storage_requested: true,
+        autonomy: { value: '4', unit: 'h' },
+        required_nominal_capacity: { value: '2.46', unit: 'kWh' },
+        battery_quantity: 1,
+        installed_nominal_capacity: { value: '5', unit: 'kWh' },
+        total_battery_cost: { value: '9000', unit: 'BRL' },
+      },
+    },
+  });
+  renderForm();
+  await screen.findByText('420,5 kWh/mês');
+  fireEvent.click(screen.getByLabelText(/incluir armazenamento/i));
+  fireEvent.change(screen.getByLabelText(/modelo de bateria/i), { target: { value: 'BAT-1' } });
+  fireEvent.click(screen.getByRole('button', { name: /simular sistema/i }));
+
+  expect(await screen.findByText('4 h')).toBeInTheDocument();
+  expect(screen.getByText('2,46 kWh')).toBeInTheDocument();
+  expect(screen.getByText('1 unidade(s)')).toBeInTheDocument();
+  expect(screen.queryByText(/sistema sem armazenamento/i)).not.toBeInTheDocument();
 });
 
 test('shows an empty state when the property has no calculated consumption', async () => {
