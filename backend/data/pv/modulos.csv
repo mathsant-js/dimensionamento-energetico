@@ -1,0 +1,11 @@
+id,fabricante,modelo,potencia_wp,voc_v,isc_a,vmp_v,imp_a,eficiencia_pct,preco_brl,fornecedor,data_coleta,url_fonte
+MOD-JAS-550-001,JA Solar,JAM72S30-550/MR,550,49.90,14.00,41.96,13.11,21.30,634.00,Buyers Energy,2026-10-09,https://www.jasolar.com/uploadfile/2023/0525/20230525053534178.pdf
+MOD-CAN-550-001,Canadian Solar,CS6W-550MS,550,49.60,14.00,41.70,13.20,21.30,589.00,Minha Casa Solar,2026-10-09,https://solsol.eu/file/view/1186/canadian-solar-cs6w-550ms-slv-550wp_en.pdf
+MOD-JIN-555-001,Jinko Solar,JKM555N-72HL4-V,555,50.34,14.07,41.64,13.33,21.48,900.00,I9Sun Energia,2026-10-09,https://www.jinkosolar.com/uploads/619f4244/JKM555-575N-72HL4-%28V%29-F1-EN.pdf
+MOD-JIN-585-001,Jinko Solar,JKM585N-72HL4-V,585,51.16,14.55,42.52,13.76,22.65,1320.00,Mercado Livre via AchaPromo,2026-10-09,https://www.jinkosolar.com/uploads/JKM565-585N-72HL4-%28V%29-F4-EN.pdf
+MOD-DAH-585-001,DAH Solar,DHN-72X16/DG-585W,585,51.60,14.20,43.20,13.54,22.65,779.00,NeoSolar,2026-10-09,https://solsol.eu/file/view/1150/dah-dhn-72x16dg-580wp-slv_en.pdf
+MOD-DAH-620-001,DAH Solar,DHN-66Z16/DG-620W,620,48.60,16.00,41.30,15.01,22.90,821.74,Casa do Micro Inversor,2026-10-09,https://cdn.enfsolar.com/z/pp/2025/5/7d9b9k7ru62i6ox3/en-dhn-66z16-dg-bw-585-625w.pdf
+MOD-GOK-620-001,Gokin Solar,GK-4-66HTBD-620M-F,620,48.34,16.21,40.48,15.33,23.00,939.00,NeoSolar,2026-10-09,https://www.gokinsolar.com/upload/download/GK-4-66HTBD-F%20590-620%20EN-202501-IM-Fiberglass.pdf
+MOD-LEA-620-001,Leapton Solar,LP182210-M-66-NB-620W,620,49.55,15.93,41.06,15.10,22.90,819.90,SGV via Mercado Livre,2026-10-10,https://www.leaptonenergy.jp/cms_xF2uQCfP/wp-content/uploads/2024/09/ProductSpec_LP182_210_M66_NB_620W_Ver.4.pdf
+MOD-RON-620-001,Ronma Solar,RM-620W-182R/132TB,620,49.60,15.91,41.40,14.99,23.00,819.00,NeoSolar via Mercado Livre,2026-10-09,https://minhacasasolar.fbitsstatic.net/media/1.rm-600-630w-182r-132tb.pdf?v=202508140925
+MOD-RES-585-001,Resun Solar,RS8I-M-DG-585W,585,51.80,14.34,43.22,13.54,22.65,850.12,Mercado Livre,2026-10-09,https://www.resunsolar.com/wp-content/uploads/2025/07/RS8I-M-DG-550-585W.pdf

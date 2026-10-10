@@ -5,24 +5,16 @@ from typing import Generator, List
 from datetime import timedelta
 from typing import List
 
-from .database import Base, engine, SessionLocal
-from .crud import property as property_crud, user as user_crud, equipment as equipment_crud
+from .database import SessionLocal
+from .crud import property as property_crud, user as user_crud, equipment as equipment_crud, pv as pv_crud
 from . import schemas, models
 from .seed import seed_equipments
 from .auth import authenticate_user, create_access_token, get_current_active_user
 from .schemas import user as user_schema, property as property_schema, equipment as equipment_schema
 from .schemas.user import Token
+from .schemas.pv import PropertySolarResourceRead, PropertySolarResourceUpsert
 from .core.config import settings
-
-# Create database tables
-Base.metadata.create_all(bind=engine)
-
-# Seed equipments
-db = SessionLocal()
-try:
-    seed_equipments(db)
-finally:
-    db.close()
+from .routers.pv import router as pv_router
 
 # Dependency to get DB session
 def get_db() -> Generator[Session, None, None]:
@@ -33,6 +25,18 @@ def get_db() -> Generator[Session, None, None]:
         db.close()
 
 app = FastAPI()
+app.include_router(pv_router)
+
+
+@app.on_event("startup")
+async def validate_runtime_configuration():
+    """Validate secrets, then seed only a schema already created by Alembic."""
+    settings.require_secret_key()
+    db = SessionLocal()
+    try:
+        seed_equipments(db)
+    finally:
+        db.close()
 
 app.add_middleware(
     CORSMiddleware,
@@ -48,7 +52,7 @@ async def register_user(user: user_schema.UserCreate, db: Session = Depends(get_
     # Check if email already exists
     db_user = user_crud.get_user_by_email(db, email=user.email)
     if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="E-mail já cadastrado")
     # Create user (password will be hashed inside CRUD)
     db_user = user_crud.create_user(db=db, user=user)
     return db_user
@@ -60,7 +64,7 @@ async def login_for_access_token(form_data: user_schema.UserLogin, db: Session =
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="E-mail ou senha incorretos",
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -103,7 +107,7 @@ async def read_property(
 ):
     db_property = property_crud.get_property(db, property_id=property_id, user_id=current_user.id)
     if db_property is None:
-        raise HTTPException(status_code=404, detail="Property not found")
+        raise HTTPException(status_code=404, detail="Residência não encontrada")
     return db_property
 
 
@@ -118,7 +122,7 @@ async def update_property(
         db, property_id=property_id, property=property, user_id=current_user.id
     )
     if db_property is None:
-        raise HTTPException(status_code=404, detail="Property not found")
+        raise HTTPException(status_code=404, detail="Residência não encontrada")
     return db_property
 
 
@@ -130,8 +134,42 @@ async def delete_property(
 ):
     db_property = property_crud.delete_property(db, property_id=property_id, user_id=current_user.id)
     if db_property is None:
-        raise HTTPException(status_code=404, detail="Property not found")
-    return {"message": "Property deleted successfully"}
+        raise HTTPException(status_code=404, detail="Residência não encontrada")
+    return {"message": "Residência excluída com sucesso"}
+
+
+@app.get(
+    "/properties/{property_id}/solar-resource",
+    response_model=PropertySolarResourceRead,
+)
+async def read_property_solar_resource(
+    property_id: int,
+    current_user: user_schema.UserRead = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    resource = pv_crud.get_solar_resource(db, property_id, current_user.id)
+    if resource is None:
+        raise HTTPException(
+            status_code=404,
+            detail="HSP não configurado para esta residência",
+        )
+    return resource
+
+
+@app.put(
+    "/properties/{property_id}/solar-resource",
+    response_model=PropertySolarResourceRead,
+)
+async def upsert_property_solar_resource(
+    property_id: int,
+    resource: PropertySolarResourceUpsert,
+    current_user: user_schema.UserRead = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    saved = pv_crud.upsert_solar_resource(db, property_id, current_user.id, resource)
+    if saved is None:
+        raise HTTPException(status_code=404, detail="Residência não encontrada")
+    return saved
 
 
 # Equipment Endpoints
@@ -167,7 +205,7 @@ async def read_property_equipments(
     # Verify property belongs to user
     db_property = property_crud.get_property(db, property_id=property_id, user_id=current_user.id)
     if db_property is None:
-        raise HTTPException(status_code=404, detail="Property not found")
+        raise HTTPException(status_code=404, detail="Residência não encontrada")
     
     return equipment_crud.get_property_equipments(db, property_id=property_id, user_id=current_user.id)
 
@@ -182,12 +220,12 @@ async def create_property_equipment(
     # Verify property belongs to user
     db_property = property_crud.get_property(db, property_id=property_id, user_id=current_user.id)
     if db_property is None:
-        raise HTTPException(status_code=404, detail="Property not found")
+        raise HTTPException(status_code=404, detail="Residência não encontrada")
     
     # Verify equipment exists
     equipment = equipment_crud.get_equipment(db, property_equipment.equipment_id)
     if equipment is None:
-        raise HTTPException(status_code=404, detail="Equipment not found")
+        raise HTTPException(status_code=404, detail="Equipamento não encontrado")
 
     existing_link = equipment_crud.get_property_equipment_by_equipment_id(
         db, property_id, property_equipment.equipment_id
@@ -195,12 +233,12 @@ async def create_property_equipment(
     if existing_link is not None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Equipment is already linked to this property",
+            detail="O equipamento já está vinculado a esta residência",
         )
 
     created = equipment_crud.create_property_equipment(db, property_id, property_equipment, user_id=current_user.id)
     if created is None:
-        raise HTTPException(status_code=404, detail="Property not found")
+        raise HTTPException(status_code=404, detail="Residência não encontrada")
     return created
 
 
@@ -215,7 +253,7 @@ async def update_property_equipment(
     # Verify property belongs to user
     db_property = property_crud.get_property(db, property_id=property_id, user_id=current_user.id)
     if db_property is None:
-        raise HTTPException(status_code=404, detail="Property not found")
+        raise HTTPException(status_code=404, detail="Residência não encontrada")
     
     # Find and update the property equipment
     db_property_equipment = db.query(models.PropertyEquipment).filter(
@@ -224,11 +262,11 @@ async def update_property_equipment(
     ).first()
     
     if db_property_equipment is None:
-        raise HTTPException(status_code=404, detail="Equipment not found for this property")
+        raise HTTPException(status_code=404, detail="Equipamento não encontrado nesta residência")
     
     updated = equipment_crud.update_property_equipment(db, equipment_id, property_equipment, user_id=current_user.id)
     if updated is None:
-        raise HTTPException(status_code=404, detail="Equipment not found for this property")
+        raise HTTPException(status_code=404, detail="Equipamento não encontrado nesta residência")
     return updated
 
 
@@ -242,7 +280,7 @@ async def delete_property_equipment(
     # Verify property belongs to user
     db_property = property_crud.get_property(db, property_id=property_id, user_id=current_user.id)
     if db_property is None:
-        raise HTTPException(status_code=404, detail="Property not found")
+        raise HTTPException(status_code=404, detail="Residência não encontrada")
     
     # Find and delete the property equipment
     db_property_equipment = db.query(models.PropertyEquipment).filter(
@@ -251,12 +289,12 @@ async def delete_property_equipment(
     ).first()
     
     if db_property_equipment is None:
-        raise HTTPException(status_code=404, detail="Equipment not found for this property")
+        raise HTTPException(status_code=404, detail="Equipamento não encontrado nesta residência")
     
     deleted = equipment_crud.delete_property_equipment(db, equipment_id, user_id=current_user.id)
     if deleted is None:
-        raise HTTPException(status_code=404, detail="Equipment not found for this property")
-    return {"message": "Equipment removed from property successfully"}
+        raise HTTPException(status_code=404, detail="Equipamento não encontrado nesta residência")
+    return {"message": "Equipamento removido da residência com sucesso"}
 
 
 # Consumption Report Endpoint
@@ -269,5 +307,5 @@ async def get_property_consumption_report(
 ):
     report = equipment_crud.get_consumption_report(db, property_id=property_id, user_id=current_user.id)
     if report is None:
-        raise HTTPException(status_code=404, detail="Property not found")
+        raise HTTPException(status_code=404, detail="Residência não encontrada")
     return report

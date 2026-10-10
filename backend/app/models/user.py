@@ -14,3 +14,4 @@ class User(Base):
 
     # Relationships
     properties = relationship("Property", back_populates="user", cascade="all, delete-orphan")
+    pv_proposals = relationship("PVProposal", back_populates="user", cascade="all, delete-orphan")

@@ -25,3 +25,11 @@ class Property(Base):
     # Relationships
     user = relationship("User", back_populates="properties")
     equipments = relationship("PropertyEquipment", back_populates="property", cascade="all, delete-orphan")
+    pv_proposals = relationship("PVProposal", back_populates="property", cascade="all, delete-orphan")
+    solar_resource = relationship(
+        "PropertySolarResource",
+        back_populates="property",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        uselist=False,
+    )

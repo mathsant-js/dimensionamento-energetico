@@ -5,11 +5,17 @@ from .equipment import (
     PropertyEquipmentBase, PropertyEquipmentCreate, PropertyEquipmentUpdate, PropertyEquipmentRead,
     PropertyEquipmentWithDetailsRead, ConsumptionReportItem, ConsumptionReport
 )
+from .pv import (
+    PVProposalCreate, PVProposalItemCreate, PVProposalItemRead, PVProposalRead,
+    PropertySolarResourceRead, PropertySolarResourceUpsert,
+)
 
 __all__ = [
     'UserBase', 'UserCreate', 'UserRead', 'UserLogin', 'Token', 'TokenData',
     'PropertyBase', 'PropertyCreate', 'PropertyUpdate', 'PropertyRead',
     'EquipmentBase', 'EquipmentCreate', 'EquipmentRead',
     'PropertyEquipmentBase', 'PropertyEquipmentCreate', 'PropertyEquipmentUpdate', 'PropertyEquipmentRead',
-    'PropertyEquipmentWithDetailsRead', 'ConsumptionReportItem', 'ConsumptionReport'
+    'PropertyEquipmentWithDetailsRead', 'ConsumptionReportItem', 'ConsumptionReport',
+    'PVProposalCreate', 'PVProposalItemCreate', 'PVProposalItemRead', 'PVProposalRead',
+    'PropertySolarResourceRead', 'PropertySolarResourceUpsert'
 ]

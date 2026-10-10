@@ -140,7 +140,7 @@ const PropertyCreateForm: React.FC<PropertyCreateFormProps> = ({ onCreate, onCan
           setErrors(errorMap);
         }
       } else {
-        setErrors({ submit: 'An unexpected error occurred' });
+        setErrors({ submit: 'Ocorreu um erro inesperado.' });
       }
     } finally {
       setLoading(false);

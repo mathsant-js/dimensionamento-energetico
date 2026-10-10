@@ -4,6 +4,9 @@ import PropertyEditForm from './PropertyEditForm.tsx';
 import PropertyDeleteModal from './PropertyDeleteModal.tsx';
 import ConsumptionReport from './ConsumptionReport.tsx';
 import PropertyEquipmentManager from './PropertyEquipmentManager.tsx';
+import SolarResourceForm from './SolarResourceForm.tsx';
+import PVSimulationForm from './PVSimulationForm.tsx';
+import PVProposalHistory from './PVProposalHistory.tsx';
 import { PropertyRead } from '../../types/property.ts';
 
 interface PropertyListProps {
@@ -18,6 +21,9 @@ const PropertyList: React.FC<PropertyListProps> = ({ token, refreshVersion, onCh
   const [editingPropertyId, setEditingPropertyId] = useState<number | null>(null);
   const [viewingReportPropertyId, setViewingReportPropertyId] = useState<number | null>(null);
   const [managingEquipmentPropertyId, setManagingEquipmentPropertyId] = useState<number | null>(null);
+  const [solarResourcePropertyId, setSolarResourcePropertyId] = useState<number | null>(null);
+  const [pvSizingPropertyId, setPvSizingPropertyId] = useState<number | null>(null);
+  const [pvProposalHistoryPropertyId, setPvProposalHistoryPropertyId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -104,6 +110,45 @@ const PropertyList: React.FC<PropertyListProps> = ({ token, refreshVersion, onCh
     }
   }
 
+  if (solarResourcePropertyId !== null) {
+    const property = properties.find((item) => item.id === solarResourcePropertyId);
+    if (property) {
+      return (
+        <SolarResourceForm
+          propertyId={property.id}
+          propertyName={property.identification}
+          token={token}
+          onClose={() => setSolarResourcePropertyId(null)}
+        />
+      );
+    }
+  }
+
+  if (pvSizingPropertyId !== null) {
+    const property = properties.find((item) => item.id === pvSizingPropertyId);
+    if (property) {
+      return (
+        <PVSimulationForm
+          propertyId={property.id}
+          propertyName={property.identification}
+          token={token}
+          onClose={() => setPvSizingPropertyId(null)}
+          onManageEquipment={() => {
+            setPvSizingPropertyId(null);
+            setManagingEquipmentPropertyId(property.id);
+          }}
+        />
+      );
+    }
+  }
+
+  if (pvProposalHistoryPropertyId !== null) {
+    const property = properties.find((item) => item.id === pvProposalHistoryPropertyId);
+    if (property) {
+      return <PVProposalHistory propertyId={property.id} propertyName={property.identification} token={token} onClose={() => setPvProposalHistoryPropertyId(null)} />;
+    }
+  }
+
   return (
     <section>
       <div className="properties-header"><h2>Suas residências</h2><span className="eyebrow">{properties.length} cadastrada{properties.length === 1 ? '' : 's'}</span></div>
@@ -131,7 +176,10 @@ const PropertyList: React.FC<PropertyListProps> = ({ token, refreshVersion, onCh
                 />
               ) : (
                 <>
-                  <div className="card-actions"><button className="secondary-button" onClick={() => handleManageEquipment(property.id)}>Gerenciar equipamentos</button>
+                  <div className="card-actions"><button onClick={() => setPvSizingPropertyId(property.id)}>Dimensionar sistema solar</button>
+                  <button className="secondary-button" onClick={() => setPvProposalHistoryPropertyId(property.id)}>Propostas salvas</button>
+                  <button className="secondary-button" onClick={() => setSolarResourcePropertyId(property.id)}>Recurso solar</button>
+                  <button className="secondary-button" onClick={() => handleManageEquipment(property.id)}>Gerenciar equipamentos</button>
                   <button className="secondary-button" onClick={() => handleViewReport(property.id)}>Relatório</button>
                   <button className="secondary-button" onClick={() => handleEdit(property.id)}>Editar</button>
                   <button className="danger-button" onClick={() => handleDelete(property.id)}>Excluir</button></div>

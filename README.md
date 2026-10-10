@@ -12,7 +12,7 @@ Desenvolvido como projeto acadêmico da FIAP.
 ## Sumário
 
 - [Funcionalidades implementadas](#funcionalidades-implementadas)
-- [Escopo futuro](#escopo-futuro)
+- [Evidências da Sprint 2](#evidências-da-sprint-2)
 - [Arquitetura](#arquitetura)
 - [Execução local](#execução-local)
 - [Pré-requisitos](#pré-requisitos)
@@ -35,13 +35,16 @@ Desenvolvido como projeto acadêmico da FIAP.
 - Total mensal calculado pelo backend.
 - Relatório com tabela detalhada, maior consumidor, percentuais e gráficos de pizza e barras.
 - Isolamento dos dados por usuário autenticado.
-- Persistência em SQLite via SQLAlchemy.
+- Persistência em SQLite via SQLAlchemy e evolução de schema com Alembic.
+- Fundação de propostas fotovoltaicas com snapshots técnicos/comerciais e isolamento por usuário (Sprint 2).
+- Dimensionamento FV on-grid e híbrido, seleção técnica de equipamentos, BESS e orçamento em BRL.
 
-## Escopo futuro
-
-O projeto também possui especificações para evolução de dimensionamento fotovoltaico, incluindo seleção de módulos e inversores, armazenamento em baterias e orçamento. Esses recursos ainda não estão implementados no aplicativo atual. Consulte `AGENTS.md` e `SPEC.md` para o escopo planejado.
+## Evidências da Sprint 2
 
 O planejamento executável da Sprint 2 está documentado em [`docs/plano_desenvolvimento_sprint2.md`](docs/plano_desenvolvimento_sprint2.md). O estado das tasks e suas prioridades pode ser acompanhado no [`backlog versionado`](docs/backlog_sprint2.md), e as convenções técnicas aprovadas estão no [`ADR-001`](docs/adr/ADR-001-decisoes-dimensionamento-fotovoltaico.md).
+
+As premissas, limitações, fontes e resultados dos cenários on-grid e híbrido
+estão nas [`evidências reproduzíveis da Sprint 2`](docs/evidencias_sprint2.md).
 
 ## Arquitetura
 
@@ -67,6 +70,10 @@ cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+cp .env.example .env
+# Gere uma chave e copie o resultado para SECRET_KEY no arquivo .env:
+openssl rand -hex 32
+alembic upgrade head
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
@@ -84,14 +91,24 @@ npm start
 
 O aplicativo inicia em `http://localhost:3000`. O frontend utiliza o proxy configurado para encaminhar requisições ao backend em `http://localhost:8000`.
 
-### Configuração opcional
+### Configuração obrigatória da autenticação
 
-Por padrão, o backend usa o banco `backend/sqlite.db`, token JWT válido por 30 minutos e uma chave de desenvolvimento. Para personalizar a autenticação, crie `backend/.env`:
+Por padrão, o backend usa o banco `backend/sqlite.db` e tokens JWT válidos por 30 minutos. A aplicação recusa iniciar sem uma `SECRET_KEY` explícita com pelo menos 32 caracteres. Crie `backend/.env` a partir do exemplo, gere uma chave e copie o resultado para o arquivo:
+
+```bash
+cd backend
+cp .env.example .env
+openssl rand -hex 32
+```
 
 ```dotenv
-SECRET_KEY=uma-chave-secreta-longa-e-aleatoria
+SECRET_KEY=cole-aqui-o-resultado-gerado-pelo-openssl
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 ```
+
+O arquivo `.env` é local e está ignorado pelo Git. A chave não deve ser publicada nem compartilhada. Se ela for alterada, os tokens emitidos anteriormente deixam de ser válidos.
+
+### Configuração opcional do banco
 
 Para usar outro banco, defina `DATABASE_URL` no ambiente antes de iniciar o backend:
 
@@ -107,7 +124,9 @@ Ao iniciar o backend, o catálogo de equipamentos é preenchido automaticamente 
 
 ```text
 backend/
+  alembic/             Migrations versionadas do banco de dados
   app/                 API FastAPI, modelos, schemas e regras de negócio
+  tests/               Testes automatizados do backend
   requirements.txt     Dependências Python
 frontend/
   src/                 Aplicação React e TypeScript
@@ -121,6 +140,20 @@ Para gerar o build de produção do frontend:
 
 ```bash
 cd frontend
+npm run build
+```
+
+Para validar as migrations e a persistência de propostas:
+
+```bash
+cd backend
+python3 -m unittest discover -s tests -v
+alembic upgrade head
+alembic downgrade -1
+alembic upgrade head
+
+cd ../frontend
+npm test -- --watchAll=false
 npm run build
 ```
 
