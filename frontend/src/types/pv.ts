@@ -7,6 +7,11 @@ export interface PVBatteryCatalogItem {
   preco_brl: string;
 }
 
+export interface PVAdditionalCostInput {
+  description: string;
+  value_brl: number;
+}
+
 export interface PVSimulationRequest {
   hsp_kwh_m2_day: number;
   hsp_source: string;
@@ -19,7 +24,7 @@ export interface PVSimulationRequest {
   battery_catalog_id?: string;
   module_catalog_id?: string;
   inverter_catalog_id?: string;
-  additional_costs: [];
+  additional_costs: PVAdditionalCostInput[];
 }
 
 export interface PVQuantity {

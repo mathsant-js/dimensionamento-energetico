@@ -5,7 +5,7 @@ Este registro acompanha `backend/data/pv/modulos.csv` e separa as duas naturezas
 - **fonte técnica:** ficha do fabricante usada nos campos elétricos em STC e registrada em `url_fonte` no CSV;
 - **referência comercial:** página brasileira usada para comprovar oferta e fotografar o preço unitário em BRL.
 
-Os preços abaixo são preços unitários anunciados, sem frete, coletados em **2026-10-09**. Quando uma página oferecia preço promocional condicionado a Pix/boleto, foi usado o preço sem essa condição. Marketplaces e comparadores foram identificados explicitamente no campo `fornecedor`. Disponibilidade e preços podem mudar; propostas futuras devem usar uma nova fotografia do catálogo sem alterar snapshots já persistidos.
+Os preços abaixo são preços unitários anunciados, sem frete, coletados em **2026-10-09**, com a referência Leapton atualizada em **2026-10-10**. Quando uma página oferecia preço promocional condicionado a Pix/boleto, foi usado o preço regular exibido na oferta. Marketplaces e comparadores foram identificados explicitamente no campo `fornecedor`. Disponibilidade e preços podem mudar; propostas futuras devem usar uma nova fotografia do catálogo sem alterar snapshots já persistidos.
 
 | ID | Produto | Fonte técnica | Referência comercial brasileira | Preço adotado |
 |---|---|---|---|---:|
@@ -16,7 +16,7 @@ Os preços abaixo são preços unitários anunciados, sem frete, coletados em **
 | `MOD-DAH-585-001` | DAH Solar DHN-72X16/DG-585W | [Ficha DAH Solar](https://solsol.eu/file/view/1150/dah-dhn-72x16dg-580wp-slv_en.pdf) | [NeoSolar](https://www.neosolar.com.br/loja/painel-solar-fotovoltaico-585w-dah-solar-dhn-72x16.html) | R$ 779,00 |
 | `MOD-DAH-620-001` | DAH Solar DHN-66Z16/DG-620W | [Ficha DAH Solar](https://cdn.enfsolar.com/z/pp/2025/5/7d9b9k7ru62i6ox3/en-dhn-66z16-dg-bw-585-625w.pdf) | [Casa do Micro Inversor](https://microinversor.com.br/produto/mod-dah620/) | R$ 821,74 |
 | `MOD-GOK-620-001` | Gokin Solar GK-4-66HTBD-620M-F | [Ficha Gokin Solar](https://www.gokinsolar.com/upload/download/GK-4-66HTBD-F%20590-620%20EN-202501-IM-Fiberglass.pdf) | [NeoSolar](https://www.neosolar.com.br/loja/painel-solar-fotovoltaico-620w-gokin-gk-4-66htbd-f.html) | R$ 939,00 |
-| `MOD-LEA-620-001` | Leapton Solar LP182210-M-66-NB-620W | [Ficha Leapton](https://www.leaptonenergy.jp/cms_xF2uQCfP/wp-content/uploads/2024/09/ProductSpec_LP182_210_M66_NB_620W_Ver.4.pdf) | [Shopee Brasil](https://shopee.com.br/Painel-Solar-Fotovoltaico-420W-OSDA-ODA420-36V-PH-i.389879245.23200313024) | R$ 1.495,00 |
+| `MOD-LEA-620-001` | Leapton Solar LP182210-M-66-NB-620W | [Ficha Leapton](https://www.leaptonenergy.jp/cms_xF2uQCfP/wp-content/uploads/2024/09/ProductSpec_LP182_210_M66_NB_620W_Ver.4.pdf) | [SGV — Mercado Livre](https://www.mercadolivre.com.br/loja/sgv?category_id=MLB270558&client=recoview-selleritems&item_id=MLB5545246184&official_store_id=103192&recos_listing=true) | R$ 819,90 |
 | `MOD-RON-620-001` | Ronma Solar RM-620W-182R/132TB | [Ficha Ronma Solar](https://minhacasasolar.fbitsstatic.net/media/1.rm-600-630w-182r-132tb.pdf?v=202508140925) | [Mercado Livre](https://lista.mercadolivre.com.br/placas-solares-620w) | R$ 819,00 |
 | `MOD-RES-585-001` | Resun Solar RS8I-M-DG-585W | [Ficha Resun Solar](https://www.resunsolar.com/wp-content/uploads/2025/07/RS8I-M-DG-550-585W.pdf) | [Mercado Livre](https://lista.mercadolivre.com.br/placas-solares-585w) | R$ 850,12 |
 

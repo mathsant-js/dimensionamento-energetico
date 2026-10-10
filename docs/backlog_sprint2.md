@@ -33,27 +33,27 @@ Os critérios completos e evidências esperadas de cada task estão na seção 8
 
 Prioridades: `P0` bloqueia a fundação ou a segurança do fluxo; `P1` entrega o caminho principal; `P2` consolida experiência, regressão e evidências.
 
-| Task | Épico | Prioridade | Depende de | Estado inicial após TASK-16 |
+| Task | Épico | Prioridade | Depende de | Estado atual |
 |---|---|---:|---|---|
 | TASK-16 | Transversal | P0 | — | Done |
-| TASK-17 | Proposta | P0 | 16 | Review |
-| TASK-18 | Dados FV | P0 | 16 | Review |
-| TASK-19 | Dados FV | P0 | 16 | Review |
-| TASK-20 | Dados FV | P0 | 16 | Review |
-| TASK-21 | Dados FV | P0 | 18, 19, 20 | Review |
+| TASK-17 | Proposta | P0 | 16 | Done |
+| TASK-18 | Dados FV | P0 | 16 | Done |
+| TASK-19 | Dados FV | P0 | 16 | Done |
+| TASK-20 | Dados FV | P0 | 16 | Done |
+| TASK-21 | Dados FV | P0 | 18, 19, 20 | Done |
 | TASK-22 | Dados FV | P0 | 16 | Done |
-| TASK-23 | Motor | P0 | 22 | Review |
-| TASK-24 | Motor | P0 | 21, 23 | Review |
-| TASK-25 | Motor | P0 | 19, 21, 24 | Review |
-| TASK-26 | Armazenamento | P0 | 20, 21, 23 | Review |
-| TASK-27 | Armazenamento | P0 | 25, 26 | Review |
-| TASK-28 | Proposta | P1 | 24, 25, 26, 27 | Review |
-| TASK-29 | Integração | P1 | 17, 21, 22, 23, 24, 25, 26, 27, 28 | Review |
-| TASK-30 | Integração | P1 | contrato estável de 29 | Review |
-| TASK-31 | Integração | P1 | 28, 29, 30 | Review |
-| TASK-32 | Integração | P1 | incrementalmente 21–28 | Review |
-| TASK-33 | Integração | P1 | 17, 29, 30, 31, 32 | Review |
-| TASK-34 | Integração | P2 | inicia com 18; encerra após 33 | Review |
+| TASK-23 | Motor | P0 | 22 | Done |
+| TASK-24 | Motor | P0 | 21, 23 | Done |
+| TASK-25 | Motor | P0 | 19, 21, 24 | Done |
+| TASK-26 | Armazenamento | P0 | 20, 21, 23 | Done |
+| TASK-27 | Armazenamento | P0 | 25, 26 | Done |
+| TASK-28 | Proposta | P1 | 24, 25, 26, 27 | Done |
+| TASK-29 | Integração | P1 | 17, 21, 22, 23, 24, 25, 26, 27, 28 | Done |
+| TASK-30 | Integração | P1 | contrato estável de 29 | Done |
+| TASK-31 | Integração | P1 | 28, 29, 30 | Done |
+| TASK-32 | Integração | P1 | incrementalmente 21–28 | Done |
+| TASK-33 | Integração | P1 | 17, 29, 30, 31, 32 | Done |
+| TASK-34 | Integração | P2 | inicia com 18; encerra após 33 | Done |
 
 O grafo foi organizado como um DAG. TASK-30 pode começar com mocks somente após estabilização do contrato da TASK-29; isso não autoriza marcar a task como concluída antes da integração real.
 
@@ -61,7 +61,7 @@ O grafo foi organizado como um DAG. TASK-30 pode começar com mocks somente apó
 
 | Backlog | To Do | In Progress | Review | Done |
 |---|---|---|---|---|
-| — | — | — | TASK-17–TASK-21, TASK-23–TASK-34 | TASK-16, TASK-22 |
+| — | — | — | — | TASK-16–TASK-34 |
 
 ### Políticas do quadro
 

@@ -122,6 +122,30 @@ test('validates fields and sends percentages as fractions to the simulation API'
   expect(screen.getByText(/aviso acadêmico permanente/i)).toBeInTheDocument();
 });
 
+test('validates and sends explicit additional costs to the simulation API', async () => {
+  mockedApi.post.mockResolvedValue({ data: simulation });
+  renderForm();
+  await screen.findByText('420,5 kWh/mês');
+
+  fireEvent.click(screen.getByRole('button', { name: /adicionar custo/i }));
+  fireEvent.click(screen.getByRole('button', { name: /simular sistema/i }));
+  expect(await screen.findByText(/preencha a descrição/i)).toBeInTheDocument();
+  expect(mockedApi.post).not.toHaveBeenCalled();
+
+  fireEvent.change(screen.getByLabelText(/descrição do custo 1/i), { target: { value: 'Instalação' } });
+  fireEvent.change(screen.getByLabelText(/^valor \(R\$\)$/i), { target: { value: '1500.00' } });
+  fireEvent.click(screen.getByRole('button', { name: /simular sistema/i }));
+
+  await waitFor(() => expect(mockedApi.post).toHaveBeenCalledTimes(1));
+  expect(mockedApi.post).toHaveBeenCalledWith(
+    '/api/properties/7/pv/simulations',
+    expect.objectContaining({
+      additional_costs: [{ description: 'Instalação', value_brl: 1500 }],
+    }),
+    expect.any(Object),
+  );
+});
+
 test('selects an inverter, renders the BOM and persists the proposal', async () => {
   const withBudget = {
     ...simulation,

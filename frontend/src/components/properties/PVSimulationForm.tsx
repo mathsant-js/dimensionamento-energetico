@@ -12,7 +12,12 @@ interface PVSimulationFormProps {
   onManageEquipment: () => void;
 }
 
-type FieldErrors = Partial<Record<'hsp' | 'source' | 'sourceDate' | 'offset' | 'pr' | 'autonomy' | 'battery' | 'batteryEfficiency', string>>;
+type FieldErrors = Partial<Record<'hsp' | 'source' | 'sourceDate' | 'offset' | 'pr' | 'autonomy' | 'battery' | 'batteryEfficiency' | 'additionalCosts', string>>;
+
+interface AdditionalCostDraft {
+  description: string;
+  value: string;
+}
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -34,6 +39,7 @@ const PVSimulationForm: React.FC<PVSimulationFormProps> = ({
   const [autonomy, setAutonomy] = useState('4');
   const [batteryId, setBatteryId] = useState('');
   const [batteryEfficiency, setBatteryEfficiency] = useState('95');
+  const [additionalCosts, setAdditionalCosts] = useState<AdditionalCostDraft[]>([]);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -97,6 +103,12 @@ const PVSimulationForm: React.FC<PVSimulationFormProps> = ({
       if (!batteryId) errors.battery = 'Selecione uma bateria.';
       if (!Number.isFinite(numericEfficiency) || numericEfficiency <= 0 || numericEfficiency > 100) errors.batteryEfficiency = 'Use um valor maior que 0 e até 100%.';
     }
+    if (additionalCosts.some((item) => {
+      const value = Number(item.value);
+      return !item.description.trim() || !Number.isFinite(value) || value < 0;
+    })) {
+      errors.additionalCosts = 'Preencha a descrição e informe um valor igual ou maior que zero para cada custo.';
+    }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -116,7 +128,10 @@ const PVSimulationForm: React.FC<PVSimulationFormProps> = ({
       performance_ratio: Number(pr) / 100,
       autonomy_hours: withBattery ? Number(autonomy) : 0,
       battery_efficiency: Number(batteryEfficiency) / 100,
-      additional_costs: [],
+      additional_costs: additionalCosts.map((item) => ({
+        description: item.description.trim(),
+        value_brl: Number(item.value),
+      })),
       ...(withBattery ? { battery_catalog_id: batteryId } : {}),
     };
 
@@ -235,6 +250,66 @@ const PVSimulationForm: React.FC<PVSimulationFormProps> = ({
             <div className="field"><label htmlFor="pv-battery-efficiency">Eficiência da bateria (%)</label><input id="pv-battery-efficiency" type="number" min="0.01" max="100" step="0.01" value={batteryEfficiency} onChange={(event) => setBatteryEfficiency(event.target.value)} aria-invalid={Boolean(fieldErrors.batteryEfficiency)} />{fieldErrors.batteryEfficiency && <span className="field-error">{fieldErrors.batteryEfficiency}</span>}</div>
             <div className="field full-width"><label htmlFor="pv-battery">Modelo de bateria</label><select id="pv-battery" value={batteryId} onChange={(event) => setBatteryId(event.target.value)} aria-invalid={Boolean(fieldErrors.battery)}><option value="">Selecione uma opção</option>{batteries.map((battery) => <option key={battery.id} value={battery.id}>{battery.fabricante} {battery.modelo} — {battery.capacidade_kwh} kWh</option>)}</select>{fieldErrors.battery && <span className="field-error">{fieldErrors.battery}</span>}{batteries.length === 0 && <span className="field-error">Catálogo de baterias vazio.</span>}</div>
           </div>}
+        </fieldset>
+
+        <fieldset className="battery-fieldset additional-costs-fieldset">
+          <div className="fieldset-heading">
+            <div>
+              <strong>Custos adicionais</strong>
+              <p className="field-help">Inclua somente valores explícitos, como instalação, estrutura, cabeamento ou proteção.</p>
+            </div>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setAdditionalCosts((items) => [...items, { description: '', value: '' }])}
+              disabled={additionalCosts.length >= 50}
+            >
+              Adicionar custo
+            </button>
+          </div>
+          {additionalCosts.length === 0 ? (
+            <p className="no-storage">Nenhum custo adicional informado.</p>
+          ) : (
+            <div className="additional-costs-list">
+              {additionalCosts.map((item, index) => (
+                <div className="additional-cost-row" key={index}>
+                  <div className="field">
+                    <label htmlFor={`pv-additional-description-${index}`}>Descrição do custo {index + 1}</label>
+                    <input
+                      id={`pv-additional-description-${index}`}
+                      maxLength={300}
+                      value={item.description}
+                      onChange={(event) => setAdditionalCosts((items) => items.map((current, currentIndex) => (
+                        currentIndex === index ? { ...current, description: event.target.value } : current
+                      )))}
+                    />
+                  </div>
+                  <div className="field">
+                    <label htmlFor={`pv-additional-value-${index}`}>Valor (R$)</label>
+                    <input
+                      id={`pv-additional-value-${index}`}
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={item.value}
+                      onChange={(event) => setAdditionalCosts((items) => items.map((current, currentIndex) => (
+                        currentIndex === index ? { ...current, value: event.target.value } : current
+                      )))}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className="danger-button remove-additional-cost"
+                    aria-label={`Remover custo ${index + 1}`}
+                    onClick={() => setAdditionalCosts((items) => items.filter((_, currentIndex) => currentIndex !== index))}
+                  >
+                    Remover
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          {fieldErrors.additionalCosts && <span className="field-error">{fieldErrors.additionalCosts}</span>}
         </fieldset>
 
         <div className="form-actions"><button type="button" className="secondary-button" onClick={onClose}>Cancelar</button><button type="submit" disabled={simulating}>{simulating ? 'Calculando solução...' : 'Simular sistema'}</button></div>

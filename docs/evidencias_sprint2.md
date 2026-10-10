@@ -17,11 +17,11 @@ coleta e URL técnica. A referência comercial usada no preço é mantida nos
 documentos abaixo:
 
 - [módulos fotovoltaicos](fontes_modulos_fotovoltaicos.md): 10 produtos, preços
-  coletados em 2026-10-09;
+  coletados em 2026-10-09 e uma referência atualizada em 2026-10-10;
 - [inversores fotovoltaicos](fontes_inversores_fotovoltaicos.md): 8 produtos,
   preços coletados em 2026-10-09;
 - [baterias fotovoltaicas](fontes_baterias_fotovoltaicas.md): 6 produtos,
-  preços coletados em 2026-10-09.
+  preços coletados em 2026-10-09 e duas referências coletadas em 2026-10-10.
 
 As URLs técnicas ficam também em `url_fonte` nos CSVs e são copiadas para o
 snapshot imutável da proposta. Alterar um CSV afeta apenas novas simulações.

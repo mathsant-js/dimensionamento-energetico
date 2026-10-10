@@ -82,6 +82,11 @@ button:disabled { cursor: wait; opacity: .65; }
 .field-error { color: #fda4af; font-size: .78rem; }
 input[aria-invalid="true"], select[aria-invalid="true"] { border-color: #fb7185; }
 .battery-fieldset { margin: 24px 0 0; padding: 18px; border: 1px solid #284553; border-radius: 12px; }
+.fieldset-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+.fieldset-heading .field-help { margin: 6px 0 0; }
+.additional-costs-list { display: grid; gap: 14px; margin-top: 18px; }
+.additional-cost-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(150px, 1fr) auto; gap: 12px; align-items: end; }
+.remove-additional-cost { margin-bottom: 1px; }
 .checkbox-field { display: flex; align-items: center; gap: 10px; color: #ecfeff; }
 .checkbox-field input { width: auto; accent-color: #22d3ee; }
 .battery-fields { margin-top: 18px; }
@@ -124,4 +129,4 @@ input[aria-invalid="true"], select[aria-invalid="true"] { border-color: #fb7185;
 .modal-backdrop { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 24px; background: rgba(2, 8, 12, .7); backdrop-filter: blur(4px); }
 .modal { max-width: 380px; background: #10202c; border: 1px solid #31505e; border-radius: 16px; padding: 26px; box-shadow: 0 24px 70px #000; }
 .modal h3 { margin-top: 0; }.modal p { color: #a9bfcc; line-height: 1.5; }
-@media (max-width: 650px) { .app-shell { padding: 22px 16px 50px; }.topbar, .dashboard-intro, .catalog-header, .property-card-top, .pv-results-heading { align-items: flex-start; flex-direction: column; }.topbar { padding-bottom: 30px; }.topbar-actions { width: 100%; }.topbar-actions button { flex: 1; }.form-grid, .catalog-filters, .equipment-list, .equipment-edit-form, .pv-option-grid, .pv-metrics { grid-template-columns: 1fr; }.auth-card { padding: 30px 24px; }.card-actions { width: 100%; }.card-actions button { flex: 1; }.equipment-card-actions, .equipment-summary { justify-items: start; }.equipment-card-controls { width: 100%; }.equipment-card-controls button { flex: 1; }.pv-result-section { padding: 18px; }.budget-total { align-items: flex-start; flex-direction: column; gap: 7px; }.save-proposal-button { width: 100%; } }
+@media (max-width: 650px) { .app-shell { padding: 22px 16px 50px; }.topbar, .dashboard-intro, .catalog-header, .property-card-top, .pv-results-heading, .fieldset-heading { align-items: flex-start; flex-direction: column; }.topbar { padding-bottom: 30px; }.topbar-actions { width: 100%; }.topbar-actions button { flex: 1; }.form-grid, .catalog-filters, .equipment-list, .equipment-edit-form, .pv-option-grid, .pv-metrics, .additional-cost-row { grid-template-columns: 1fr; }.auth-card { padding: 30px 24px; }.card-actions { width: 100%; }.card-actions button { flex: 1; }.equipment-card-actions, .equipment-summary { justify-items: start; }.equipment-card-controls { width: 100%; }.equipment-card-controls button { flex: 1; }.pv-result-section { padding: 18px; }.budget-total { align-items: flex-start; flex-direction: column; gap: 7px; }.save-proposal-button { width: 100%; } }
