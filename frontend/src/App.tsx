@@ -40,7 +40,7 @@ function App() {
       localStorage.setItem('token', newToken);
       setToken(newToken);
     } catch (error: any) {
-      setLoginError('Invalid email or password');
+      setLoginError('E-mail ou senha inválidos.');
     } finally {
       setIsLoggingIn(false);
     }
@@ -68,7 +68,7 @@ function App() {
       if (error.response?.data?.detail) {
         setRegisterError(error.response.data.detail);
       } else {
-        setRegisterError('Registration failed');
+        setRegisterError('Não foi possível criar a conta.');
       }
     } finally {
       setIsRegistering(false);

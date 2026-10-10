@@ -47,7 +47,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onRegister, onCancel, isReg
           setErrors(errorMap);
         }
       } else {
-        setErrors({ submit: 'Registration failed' });
+        setErrors({ submit: 'Não foi possível criar a conta.' });
       }
     }
   };
@@ -58,7 +58,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onRegister, onCancel, isReg
       <p className="subtitle">Comece a mapear o consumo das suas residências.</p>
       <form className="form-grid" onSubmit={handleSubmit}>
         <div>
-          <label>Name:</label>
+          <label>Nome:</label>
           <input
             type="text"
             name="name"
@@ -70,7 +70,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onRegister, onCancel, isReg
         </div>
         
         <div>
-          <label>Email:</label>
+          <label>E-mail:</label>
           <input
             type="email"
             name="email"
@@ -82,7 +82,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onRegister, onCancel, isReg
         </div>
         
         <div>
-          <label>Password:</label>
+          <label>Senha:</label>
           <input
             type="password"
             name="password"

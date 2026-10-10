@@ -139,7 +139,7 @@ const PropertyEditForm: React.FC<PropertyEditFormProps> = ({ property, onSave, o
           setErrors(errorMap);
         }
       } else {
-        setErrors({ submit: 'An unexpected error occurred' });
+        setErrors({ submit: 'Ocorreu um erro inesperado.' });
       }
     } finally {
       setLoading(false);

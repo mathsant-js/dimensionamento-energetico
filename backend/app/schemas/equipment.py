@@ -22,11 +22,11 @@ class EquipmentBase(BaseModel):
     @classmethod
     def validate_required_text_fields(cls, value):
         if value is None:
-            raise ValueError("This field is required")
+            raise ValueError("Este campo é obrigatório")
         if isinstance(value, str):
             value = value.strip()
             if not value:
-                raise ValueError("This field is required")
+                raise ValueError("Este campo é obrigatório")
         return value
 
 
@@ -52,9 +52,9 @@ class PropertyEquipmentBase(BaseModel):
     @classmethod
     def validate_hours_per_day(cls, value):
         if value is None:
-            raise ValueError("This field is required")
+            raise ValueError("Este campo é obrigatório")
         if value < 0 or value > 24:
-            raise ValueError("Daily usage time must be between 0 and 24 hours")
+            raise ValueError("O tempo de uso diário deve estar entre 0 e 24 horas")
         return value
 
 
@@ -70,14 +70,14 @@ class PropertyEquipmentUpdate(BaseModel):
     @classmethod
     def validate_quantity(cls, value):
         if value <= 0:
-            raise ValueError("Quantity must be greater than zero")
+            raise ValueError("A quantidade deve ser maior que zero")
         return value
 
     @field_validator("hours_per_day")
     @classmethod
     def validate_hours_per_day(cls, value):
         if value < 0 or value > 24:
-            raise ValueError("Daily usage time must be between 0 and 24 hours")
+            raise ValueError("O tempo de uso diário deve estar entre 0 e 24 horas")
         return value
 
 

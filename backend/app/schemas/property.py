@@ -30,11 +30,11 @@ class PropertyBase(BaseModel):
     @classmethod
     def validate_required_text_fields(cls, value):
         if value is None:
-            raise ValueError("This field is required")
+            raise ValueError("Este campo é obrigatório")
         if isinstance(value, str):
             value = value.strip()
             if not value:
-                raise ValueError("This field is required")
+                raise ValueError("Este campo é obrigatório")
         return value
 
     @field_validator("address", "city", "state", "orientation", "zipcode", mode="before")
@@ -69,7 +69,7 @@ class PropertyUpdate(BaseModel):
         if isinstance(value, str):
             value = value.strip()
             if not value:
-                raise ValueError("This field is required")
+                raise ValueError("Este campo é obrigatório")
         return value
 
     @field_validator("address", "city", "state", "orientation", "zipcode", mode="before")
