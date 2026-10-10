@@ -95,9 +95,6 @@ function App() {
           <span className="eyebrow">Energia residencial</span>
           <h1>Seu espaço, sob controle.</h1>
           <p className="subtitle">Entre para organizar suas residências e preparar o dimensionamento energético.</p>
-          {!showRegisterForm && (
-            <button onClick={() => setShowRegisterForm(true)}>Criar conta</button>
-          )}
           {showRegisterForm && (
             <RegisterForm
               onRegister={handleRegister}
@@ -120,12 +117,16 @@ function App() {
                 onChange={(event) => setPassword(event.target.value)}
               /></div>
               <button
+                className="login-submit"
                 onClick={() => handleLogin(email, password)}
                 disabled={isLoggingIn}
               >
                 {isLoggingIn ? 'Entrando...' : 'Entrar'}
               </button>
-              <p className="auth-switch">Ainda não tem conta?<button className="link-button" onClick={() => setShowRegisterForm(true)}>Criar conta</button></p>
+              <p className="auth-switch">
+                <span>Ainda não tem uma conta?</span>
+                <button className="link-button" onClick={() => setShowRegisterForm(true)}>Criar conta</button>
+              </p>
             </div>
           )}
         </main>
