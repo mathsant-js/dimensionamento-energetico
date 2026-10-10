@@ -94,6 +94,7 @@ input[aria-invalid="true"], select[aria-invalid="true"] { border-color: #fb7185;
 .simulation-status h2 { margin-top: 8px; }
 .simulation-status p { color: #b8cad7; margin-bottom: 0; }
 .pv-results { display: grid; gap: 22px; }
+.saved-proposal-content { display: grid; gap: 22px; }
 .pv-results-heading { display: flex; justify-content: space-between; align-items: center; gap: 18px; }
 .pv-results-heading h2 { margin-top: 7px; }
 .pv-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }

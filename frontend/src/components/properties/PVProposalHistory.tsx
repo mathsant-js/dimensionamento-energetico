@@ -52,21 +52,23 @@ const PVProposalHistory: React.FC<Props> = ({ propertyId, propertyName, token, o
     return <section className="pv-sizing-section">
       <button className="secondary-button" onClick={() => setSelected(null)}>← Voltar ao histórico</button>
       <div className="catalog-header"><div><span className="eyebrow">Proposta #{selected.id}</span><h1>Proposta fotovoltaica salva</h1><p className="subtitle">{propertyName} · {new Date(selected.created_at).toLocaleString('pt-BR')}</p></div></div>
-      <div className="pv-metrics">
-        <div><span>Consumo de referência</span><strong>{number(selected.reference_consumption_kwh_month)} kWh/mês</strong></div>
-        <div><span>Energia-alvo</span><strong>{number(selected.target_energy_kwh)} kWh/mês</strong></div>
-        <div><span>Potência necessária</span><strong>{number(selected.required_pv_power_kwp)} kWp</strong></div>
-        <div><span>Potência instalada</span><strong>{number(selected.installed_pv_power_kwp)} kWp</strong></div>
+      <div className="saved-proposal-content">
+        <div className="pv-metrics">
+          <div><span>Consumo de referência</span><strong>{number(selected.reference_consumption_kwh_month)} kWh/mês</strong></div>
+          <div><span>Energia-alvo</span><strong>{number(selected.target_energy_kwh)} kWh/mês</strong></div>
+          <div><span>Potência necessária</span><strong>{number(selected.required_pv_power_kwp)} kWp</strong></div>
+          <div><span>Potência instalada</span><strong>{number(selected.installed_pv_power_kwp)} kWp</strong></div>
+        </div>
+        <section className="pv-result-section budget-section">
+          <h3>Componentes e custos preservados</h3>
+          <div className="bom-table-wrap"><table className="bom-table"><thead><tr><th>Item</th><th>Qtd.</th><th>Preço unitário</th><th>Subtotal</th></tr></thead><tbody>
+            {selected.items.map((item) => <tr key={item.id}><td>{item.description}<small>{item.supplier ? `Fornecedor: ${item.supplier}` : ''}</small></td><td>{number(item.quantity)} {item.unit}</td><td>{money(item.unit_price_brl)}</td><td>{money(item.subtotal_brl)}</td></tr>)}
+          </tbody></table></div>
+          <div className="budget-total"><span>Total preliminar</span><strong>{money(selected.total_cost_brl)}</strong></div>
+        </section>
+        {selected.items.flatMap((item) => item.string_configuration || []).length > 0 && <section className="pv-result-section"><h3>Configuração de strings</h3><ul className="string-list">{selected.items.flatMap((item) => item.string_configuration || []).map((string) => <li key={string.mppt_id}>MPPT {string.mppt_id}: {string.module_quantity} módulos · Voc {number(string.voc_v)} V · Vmp {number(string.vmp_v)} V</li>)}</ul></section>}
+        <aside className="academic-disclaimer"><strong>Aviso acadêmico permanente</strong><p>{selected.disclaimer}</p><small>Metodologia: {selected.methodology_version}</small></aside>
       </div>
-      <section className="pv-result-section budget-section">
-        <h3>Componentes e custos preservados</h3>
-        <div className="bom-table-wrap"><table className="bom-table"><thead><tr><th>Item</th><th>Qtd.</th><th>Preço unitário</th><th>Subtotal</th></tr></thead><tbody>
-          {selected.items.map((item) => <tr key={item.id}><td>{item.description}<small>{item.supplier ? `Fornecedor: ${item.supplier}` : ''}</small></td><td>{number(item.quantity)} {item.unit}</td><td>{money(item.unit_price_brl)}</td><td>{money(item.subtotal_brl)}</td></tr>)}
-        </tbody></table></div>
-        <div className="budget-total"><span>Total preliminar</span><strong>{money(selected.total_cost_brl)}</strong></div>
-      </section>
-      {selected.items.flatMap((item) => item.string_configuration || []).length > 0 && <section className="pv-result-section"><h3>Configuração de strings</h3><ul className="string-list">{selected.items.flatMap((item) => item.string_configuration || []).map((string) => <li key={string.mppt_id}>MPPT {string.mppt_id}: {string.module_quantity} módulos · Voc {number(string.voc_v)} V · Vmp {number(string.vmp_v)} V</li>)}</ul></section>}
-      <aside className="academic-disclaimer"><strong>Aviso acadêmico permanente</strong><p>{selected.disclaimer}</p><small>Metodologia: {selected.methodology_version}</small></aside>
     </section>;
   }
 
