@@ -127,6 +127,8 @@ A partir da raiz do repositório, com as dependências instaladas:
 
 ```bash
 cd backend
+cp .env.example .env
+# Substitua SECRET_KEY no .env antes de iniciar a aplicação.
 python3 -m unittest tests.test_task34_documentation_scenarios -v
 python3 -m unittest tests.test_task33_pv_api_e2e -v
 python3 -m unittest discover -s tests -v

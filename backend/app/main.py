@@ -5,7 +5,7 @@ from typing import Generator, List
 from datetime import timedelta
 from typing import List
 
-from .database import Base, engine, SessionLocal
+from .database import SessionLocal
 from .crud import property as property_crud, user as user_crud, equipment as equipment_crud, pv as pv_crud
 from . import schemas, models
 from .seed import seed_equipments
@@ -15,16 +15,6 @@ from .schemas.user import Token
 from .schemas.pv import PropertySolarResourceRead, PropertySolarResourceUpsert
 from .core.config import settings
 from .routers.pv import router as pv_router
-
-# Create database tables
-Base.metadata.create_all(bind=engine)
-
-# Seed equipments
-db = SessionLocal()
-try:
-    seed_equipments(db)
-finally:
-    db.close()
 
 # Dependency to get DB session
 def get_db() -> Generator[Session, None, None]:
@@ -36,6 +26,17 @@ def get_db() -> Generator[Session, None, None]:
 
 app = FastAPI()
 app.include_router(pv_router)
+
+
+@app.on_event("startup")
+async def validate_runtime_configuration():
+    """Validate secrets, then seed only a schema already created by Alembic."""
+    settings.require_secret_key()
+    db = SessionLocal()
+    try:
+        seed_equipments(db)
+    finally:
+        db.close()
 
 app.add_middleware(
     CORSMiddleware,

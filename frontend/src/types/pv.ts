@@ -125,6 +125,43 @@ export interface PVSimulation {
 export interface PVProposal {
   id: number;
   property_id: number;
+  status: string;
+  reference_consumption_kwh_month: string;
+  hsp_kwh_m2_day: string;
+  hsp_source: string;
+  hsp_source_date: string;
+  target_offset_fraction: string;
+  performance_ratio: string;
+  target_energy_kwh: string;
+  required_pv_power_kwp: string;
+  installed_pv_power_kwp: string;
+  battery_requested: boolean;
+  autonomy_hours: string;
+  required_battery_capacity_kwh: string;
+  installed_battery_capacity_kwh: string;
+  modules_cost_brl: string;
+  inverter_cost_brl: string;
+  batteries_cost_brl: string;
+  additional_cost_brl: string;
+  equipment_cost_brl: string;
   total_cost_brl: string;
+  methodology_version: string;
+  disclaimer: string;
   created_at: string;
+  updated_at: string;
+  items: PVProposalItem[];
+}
+
+export interface PVProposalItem {
+  id: number;
+  item_type: 'module' | 'inverter' | 'battery' | 'additional';
+  description: string;
+  quantity: string;
+  unit: string;
+  unit_price_brl: string;
+  subtotal_brl: string;
+  manufacturer: string | null;
+  model: string | null;
+  supplier: string | null;
+  string_configuration: PVStringArrangement[] | null;
 }

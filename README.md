@@ -70,6 +70,9 @@ cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+cp .env.example .env
+# Gere uma chave e copie o resultado para SECRET_KEY no arquivo .env:
+openssl rand -hex 32
 alembic upgrade head
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
@@ -88,14 +91,24 @@ npm start
 
 O aplicativo inicia em `http://localhost:3000`. O frontend utiliza o proxy configurado para encaminhar requisições ao backend em `http://localhost:8000`.
 
-### Configuração opcional
+### Configuração obrigatória da autenticação
 
-Por padrão, o backend usa o banco `backend/sqlite.db`, token JWT válido por 30 minutos e uma chave de desenvolvimento. Para personalizar a autenticação, crie `backend/.env`:
+Por padrão, o backend usa o banco `backend/sqlite.db` e tokens JWT válidos por 30 minutos. A aplicação recusa iniciar sem uma `SECRET_KEY` explícita com pelo menos 32 caracteres. Crie `backend/.env` a partir do exemplo, gere uma chave e copie o resultado para o arquivo:
+
+```bash
+cd backend
+cp .env.example .env
+openssl rand -hex 32
+```
 
 ```dotenv
-SECRET_KEY=uma-chave-secreta-longa-e-aleatoria
+SECRET_KEY=cole-aqui-o-resultado-gerado-pelo-openssl
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 ```
+
+O arquivo `.env` é local e está ignorado pelo Git. A chave não deve ser publicada nem compartilhada. Se ela for alterada, os tokens emitidos anteriormente deixam de ser válidos.
+
+### Configuração opcional do banco
 
 Para usar outro banco, defina `DATABASE_URL` no ambiente antes de iniciar o backend:
 

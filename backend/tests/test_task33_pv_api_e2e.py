@@ -10,11 +10,14 @@ from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
 
 from app.database import Base, get_db as database_get_db
+from app.core.config import settings
 from app.main import app, get_db as main_get_db
 
 
 class PVApiEndToEndTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
+        self.previous_secret_key = settings.SECRET_KEY
+        settings.SECRET_KEY = "task-33-test-secret-key-with-32-characters"
         self.temp_dir = tempfile.TemporaryDirectory(prefix="task33-")
         database_path = Path(self.temp_dir.name) / "e2e.sqlite3"
         self.engine = create_engine(
@@ -54,6 +57,7 @@ class PVApiEndToEndTests(unittest.IsolatedAsyncioTestCase):
         Base.metadata.drop_all(self.engine)
         self.engine.dispose()
         self.temp_dir.cleanup()
+        settings.SECRET_KEY = self.previous_secret_key
 
     async def register_and_login(self, name, email):
         password = "senha-segura-123"
