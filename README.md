@@ -12,7 +12,7 @@ Desenvolvido como projeto acadêmico da FIAP.
 ## Sumário
 
 - [Funcionalidades implementadas](#funcionalidades-implementadas)
-- [Escopo futuro](#escopo-futuro)
+- [Evidências da Sprint 2](#evidências-da-sprint-2)
 - [Arquitetura](#arquitetura)
 - [Execução local](#execução-local)
 - [Pré-requisitos](#pré-requisitos)
@@ -37,12 +37,14 @@ Desenvolvido como projeto acadêmico da FIAP.
 - Isolamento dos dados por usuário autenticado.
 - Persistência em SQLite via SQLAlchemy e evolução de schema com Alembic.
 - Fundação de propostas fotovoltaicas com snapshots técnicos/comerciais e isolamento por usuário (Sprint 2).
+- Dimensionamento FV on-grid e híbrido, seleção técnica de equipamentos, BESS e orçamento em BRL.
 
-## Escopo futuro
-
-O projeto também possui especificações para evolução de dimensionamento fotovoltaico, incluindo seleção de módulos e inversores, armazenamento em baterias e orçamento. Esses recursos ainda não estão implementados no aplicativo atual. Consulte `AGENTS.md` e `SPEC.md` para o escopo planejado.
+## Evidências da Sprint 2
 
 O planejamento executável da Sprint 2 está documentado em [`docs/plano_desenvolvimento_sprint2.md`](docs/plano_desenvolvimento_sprint2.md). O estado das tasks e suas prioridades pode ser acompanhado no [`backlog versionado`](docs/backlog_sprint2.md), e as convenções técnicas aprovadas estão no [`ADR-001`](docs/adr/ADR-001-decisoes-dimensionamento-fotovoltaico.md).
+
+As premissas, limitações, fontes e resultados dos cenários on-grid e híbrido
+estão nas [`evidências reproduzíveis da Sprint 2`](docs/evidencias_sprint2.md).
 
 ## Arquitetura
 
@@ -132,9 +134,14 @@ Para validar as migrations e a persistência de propostas:
 
 ```bash
 cd backend
-python -m unittest discover -s tests -v
+python3 -m unittest discover -s tests -v
 alembic upgrade head
 alembic downgrade -1
+alembic upgrade head
+
+cd ../frontend
+npm test -- --watchAll=false
+npm run build
 ```
 
 O projeto também inclui scripts de verificação manual no diretório `backend`, incluindo o teste de isolamento de dados entre usuários.
